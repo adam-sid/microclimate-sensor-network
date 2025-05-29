@@ -2,7 +2,7 @@
 
 [Link to website](https://agriscanner.onrender.com/)
 
-Important note: This is hosted on a free web hosting service. Therefore it can take up to a minute to spin up after clicking the link.
+_Important note: This is hosted on a free web hosting service. Therefore it can take up to a minute to spin up after clicking the link._
 
 This repo will hold the source documents for a prototype **minimally intrusive data collection system**. This will form part of a dissertation for a Computer Science Master's degree at the University of Bristol.
 ## Current concept
