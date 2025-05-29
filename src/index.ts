@@ -1,10 +1,17 @@
-import express from 'express';
+//Express, Request, Response are types from the express module
+import express, { Express, Request, Response } from 'express';
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
-app.get('/', (_req, res) => {
-  res.send('Hello from Express + TypeScript!');
+// Writing out the types for request and response just for clarity
+// In reality, typescriopt can infer these types automatically
+app.get('/', (req: Request, res: Response) => {
+  res.send('Hello from Express + TypeScript!!!!');
+});
+
+app.get('/subdirectory', (req: Request, res: Response) => {
+  res.send('Oh look a subdirectory!!');
 });
 
 app.listen(port, () => {
