@@ -61,7 +61,7 @@ farm. Possible features include:
 	- [Would use a GSM module such as a SIM800L](https://www.aliexpress.com/item/1005005687766384.html?spm=a2g0o.productlist.main.3.7bc1189aNFQ8Xq).
 	- This can be connected to an ESP32 to give it mobile data.
 
-	![Image of a SIM800L module](/images/sim800l.jpg)
+	![Image of a SIM800L module](/images/sim800L.jpg)
 
 	- Could then use a cheap prepaid sim. [There are many on amazon](https://www.amazon.co.uk/s?k=prepaid+sim+card&i=electronics&crid=1W5QIVJJYJI45&sprefix=prepaid+sim+car%2Celectronics%2C95&ref=nb_sb_noss_2)
 
