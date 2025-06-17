@@ -72,7 +72,12 @@ farm. Possible features include:
 
 - **Sensors**
 	- There are 100s of sensors that are compatible with an ESP32.
-	- Here are some guides on using sensors that are useful for 
+	- Here are some guides on using sensors that are useful for:
+		- [Temperature](https://randomnerdtutorials.com/esp32-ds18b20-temperature-arduino-ide/)
+		- [Humidity](https://randomnerdtutorials.com/esp32-dht11-dht22-temperature-humidity-sensor-arduino-ide/)
+		- [Soil moisture](https://randomnerdtutorials.com/guide-for-soil-moisture-sensor-yl-69-or-hl-69-with-the-arduino/)
+		- [Wind speed](https://randomnerdtutorials.com/esp32-anemometer-wind-speed-arduino/)
+ 
 
 - **Power**
 	- Battery packs and perhaps small solar modules.
