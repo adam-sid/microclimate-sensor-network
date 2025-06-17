@@ -50,23 +50,42 @@ farm. Possible features include:
 	_ESP32 is a family of low-cost, energy-efficient microcontrollers that
 	integrate both Wi-Fi and Bluetooth capabilities._
 
-	- [They are exceedingly cheap costing ~£2 per unit](https://www.aliexpress.com/item/1005006825727330.html?spm=a2g0o.productlist.main.1.1fcc45879aikPb)
+	- [They are exceedingly cheap costing ~£2-4 per unit](https://www.aliexpress.com/item/1005006825727330.html?spm=a2g0o.productlist.main.1.1fcc45879aikPb)
 	and capable of relaying information over Wi-Fi and bluetooth
 	- They can be hooked up to a variety of sensors including temperature, 
 	humidity, soil moisture and wind speed. See section below.
 
 	![Image of an ESP32 module](/images/esp32-module.jpg)
 
+	- Alternative: Use an arduino (less powerful/modern and more expensive)
+
 - **Mobile connectivity**
 	- [Would use a GSM module such as a SIM800L](https://www.aliexpress.com/item/1005005687766384.html?spm=a2g0o.productlist.main.3.7bc1189aNFQ8Xq).
+	- Again this is very cheap at ~£2-4 per unit
 	- This can be connected to an ESP32 to give it mobile data.
 
 	![Image of a SIM800L module](/images/sim800L.jpg)
 
 	- Could then use a cheap prepaid sim. [There are many on amazon](https://www.amazon.co.uk/s?k=prepaid+sim+card&i=electronics&crid=1W5QIVJJYJI45&sprefix=prepaid+sim+car%2Celectronics%2C95&ref=nb_sb_noss_2)
 
+	- Alternative would be to use a long range radio module but this is more complex
+
 - **Sensors**
-	- 
+	- There are 100s of sensors that are compatible with an ESP32.
+	- Here are some guides on using sensors that are useful for 
+
+- **Power**
+	- Battery packs and perhaps small solar modules.
+
+### Rough hardware cost
+
+ - 3 ESP32 sensors @ £4 p.u
+ - 3 SIM 800L @ £3 p.u
+ - 3 PAYG SIM cards @ £5 p.u
+ - 3 Batteries @ £8 p.u
+ - 12 sensors at ~£3 p.u 
+ - Total cost: £96
+ - Will ask TechHub what they have for me to use.
 
 	
 
