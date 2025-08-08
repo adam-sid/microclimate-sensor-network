@@ -9,9 +9,24 @@
 <body>
   <h1>Prototype website here - currently in development!</h1>
   <p>
-    Here will go live data (temperature, humidity, soil moisture levels, wind
-    speed) for different sections of an apple farm!
+    Here's the most up to date data:
   </p>
+
+  <p id="latest-data">
+
+  </p>
+
+  <script>
+    fetch('/api/chipping-sodbury')
+      .then(res => {
+        return res.json();
+      })
+      .then(data => {
+        data = JSON.stringify(data)
+        document.querySelector('#latest-data').insertAdjacentText('beforeend', data)
+      })
+      .catch(error => console.log(error));
+  </script>
 
 </body>
 

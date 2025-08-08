@@ -51,5 +51,16 @@ app.post('/api/chipping-sodbury', async (req: Request, res: Response) => {
   }
 });
 
+app.get('/api/chipping-sodbury', async (req: Request, res: Response) => {
+  try {
+    await pool.query(
+      `SELECT * FROM chipping_sodbury ORDER BY timestamp DESC LIMIT 1;`
+    )
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'failed to select from database' });
+  }
+});
+
 app.listen(port, () => {
 });
