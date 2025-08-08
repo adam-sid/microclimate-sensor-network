@@ -22,6 +22,7 @@
         return res.json();
       })
       .then(data => {
+        console.log('received', data)
         data = JSON.stringify(data)
         document.querySelector('#latest-data').insertAdjacentText('beforeend', data)
       })
