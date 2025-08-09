@@ -18,6 +18,7 @@ app.post('/api/chipping-sodbury', async (req: Request, res: Response) => {
     humidity,
     soil_moisture,
     wind_speed,
+    gust_speed,
     rssi0,
     rssi1,
     snr0,
@@ -27,8 +28,8 @@ app.post('/api/chipping-sodbury', async (req: Request, res: Response) => {
   try {
     const query = `INSERT INTO chipping_sodbury 
       (timestamp, device_id, packet_id, temperature, humidity, soil_moisture, 
-      wind_speed, rssi0, rssi1, snr0, snr1)
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11);`;
+      wind_speed, gust_speed, rssi0, rssi1, snr0, snr1)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11, $12);`;
     const values = [
       timestamp,
       device_id,
@@ -37,6 +38,7 @@ app.post('/api/chipping-sodbury', async (req: Request, res: Response) => {
       humidity,
       soil_moisture,
       wind_speed,
+      gust_speed,
       rssi0,
       rssi1,
       snr0,

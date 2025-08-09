@@ -104,4 +104,23 @@ document.addEventListener('DOMContentLoaded', () => {
     .catch(error => console.log(error));
 
 
+  fetch('/api/chipping-sodbury?column=gust_speed&device_id=1')
+    .then(res => {
+      return res.json();
+    })
+    .then(data => {
+      console.log('received', data)
+      document.querySelector('#gust-speed-1').insertAdjacentText('beforeend', data.gust_speed)
+    })
+    .catch(error => console.log(error));
+
+  fetch('/api/chipping-sodbury?column=gust_speed&device_id=2')
+    .then(res => {
+      return res.json();
+    })
+    .then(data => {
+      console.log('received', data)
+      document.querySelector('#gust-speed-2').insertAdjacentText('beforeend', data.gust_speed)
+    })
+    .catch(error => console.log(error));
 });
