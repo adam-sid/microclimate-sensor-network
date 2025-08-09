@@ -1,0 +1,14 @@
+.grid {
+    align-items: stretch;
+}
+
+.grid>div {
+    display: flex;
+}
+
+.grid>div article {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex: 1;
+}
