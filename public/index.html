@@ -3,32 +3,77 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Smart farm</title>
+  <title>Agriscanner</title>
+  <link rel="stylesheet" href="styles/pico.min.css">
+  <script src="fetchData.js"></script>
 </head>
 
 <body>
-  <h1>Prototype website here - currently in development!</h1>
-  <p>
-    Here's the most up to date data:
-  </p>
+  <h1 id="location">Data for </h1>
 
-  <p id="latest-data">
+  <main class="container">
+    <div class="grid">
+      <h2>Node 1</h2>
+      <div>
+        <article>
+          <h3>Temperature</h3>
+          <p id="temperature-1"></p>
+        </article>
+      </div>
 
-  </p>
+      <div>
+        <article>
+          <h3>Humidity</h3>
+          <p id="humidity-1"></p>
+        </article>
+      </div>
 
-  <script>
-    fetch('/api/chipping-sodbury')
-      .then(res => {
-        return res.json();
-      })
-      .then(data => {
-        console.log('received', data)
-        data = JSON.stringify(data)
-        document.querySelector('#latest-data').insertAdjacentText('beforeend', data)
-      })
-      .catch(error => console.log(error));
-  </script>
+      <div>
+        <article>
+          <h3>Wind speed</h3>
+          <p id="wind-speed-1"></p>
+        </article>
+      </div>
 
+      <div>
+        <article>
+          <h3>Soil moisture</h3>
+          <p id="soil-moisture-1"></p>
+        </article>
+      </div>
+    </div>
+
+    <div class="grid">
+      <h2>Node 2</h2>
+      <div>
+        <article>
+          <h3>Temperature</h3>
+          <p id="temperature-2"></p>
+        </article>
+      </div>
+
+      <div>
+        <article>
+          <h3>Humidity</h3>
+          <p id="humidity-2"></p>
+        </article>
+      </div>
+
+      <div>
+        <article>
+          <h3>Wind speed</h3>
+          <p id="wind-speed-2"></p>
+        </article>
+      </div>
+
+      <div>
+        <article>
+          <h3>Soil moisture</h3>
+          <p id="soil-moisture-2"></p>
+        </article>
+      </div>
+    </div>
+  </main>
 </body>
 
 </html>
