@@ -80,4 +80,28 @@ document.addEventListener('DOMContentLoaded', () => {
       document.querySelector('#soil-moisture-2').insertAdjacentText('beforeend', data.soil_moisture)
     })
     .catch(error => console.log(error));
+
+  fetch('/api/chipping-sodbury?column=timestamp&device_id=1')
+    .then(res => {
+      return res.json();
+    })
+    .then(data => {
+      console.log('received', data)
+      const britishTime = new Date(data.timestamp).toLocaleString('en-GB', { timeZone: 'Europe/London' });
+      document.querySelector('#timestamp-1').insertAdjacentText('beforeend', britishTime)
+    })
+    .catch(error => console.log(error));
+
+  fetch('/api/chipping-sodbury?column=timestamp&device_id=2')
+    .then(res => {
+      return res.json();
+    })
+    .then(data => {
+      console.log('received', data)
+      const britishTime = new Date(data.timestamp).toLocaleString('en-GB', { timeZone: 'Europe/London' });
+      document.querySelector('#timestamp-2').insertAdjacentText('beforeend', britishTime)
+    })
+    .catch(error => console.log(error));
+
+
 });
