@@ -6,9 +6,30 @@
     display: flex;
 }
 
-.grid>div article {
+.grid>div>a {
+    flex: 1;
+    display: flex;
+    text-decoration: none;
+}
+
+.grid>div>a>article {
+    width: 100%;
+}
+
+article {
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
+}
+
+.card-link {
+    text-decoration: none;
+    display: block;
+}
+
+.card-link:hover article {
+    background: var(--link-hover-color);
+}
+
+article>div {
     flex: 1;
 }

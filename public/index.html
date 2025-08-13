@@ -5,44 +5,71 @@
   <meta charset="UTF-8">
   <title>Agriscanner</title>
   <link rel="stylesheet" href="styles/pico.min.css">
+  <link rel="stylesheet" href="styles/pico.colors.min.css">
   <link rel="stylesheet" href="styles/style.css">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="fetchData.js"></script>
 </head>
 
 <body>
-  <h1 id="location">Data for </h1>
-
   <main class="container">
+    <div>
+      <h1 id="location">Data for </h1>
+    </div>
+
     <div class="grid">
       <h2>Node 1</h2>
       <div>
-        <article>
-          <h3>Temperature &deg;C</h3>
-          <p id="temperature-1"></p>
-        </article>
+        <a href="temperature.html" class="contrast card-link">
+          <article>
+            <div>
+              <h3 class="pico-color-red-250">Temperature</h3>
+            </div>
+            <div>
+              <h3 class="pico-color-red-250" id="temperature-1">&deg;C</h3>
+            </div>
+          </article>
+        </a>
       </div>
 
       <div>
-        <article>
-          <h3>Humidity (%)</h3>
-          <p id="humidity-1"></p>
-        </article>
+        <a href="https://wikipedia.com" class="contrast card-link">
+          <article>
+            <div>
+              <h3 class="pico-color-blue-250">Humidity</h3>
+            </div>
+            <div>
+              <h3 class="pico-color-blue-250" id="humidity-1">%</h3>
+            </div>
+          </article>
+        </a>
       </div>
 
       <div>
-        <article>
-          <h3>Wind speed (m/s)</h3>
-          <p id="wind-speed-1"></p>
-          <small id="gust-speed-1">with gusts of </small>
-        </article>
+        <a href="https://wikipedia.com" class="contrast card-link">
+          <article>
+            <div>
+              <h3 class="pico-color-cyan-250">Wind speed</h3>
+            </div>
+            <div>
+              <h3 class="pico-color-cyan-250" id="wind-speed-1">m/s</h3>
+              <small class="pico-color-cyan-250" id="gust-speed-1">with gusts of </small>
+            </div>
+          </article>
+        </a>
       </div>
 
       <div>
-        <article>
-          <h3>Soil moisture (raw)</h3>
-          <p id="soil-moisture-1"></p>
-        </article>
+        <a href="https://wikipedia.com" class="contrast card-link">
+          <article>
+            <div>
+              <h3 class="pico-color-jade-250">Soil moisture (raw)</h3>
+            </div>
+            <div>
+              <h3 class="pico-color-jade-250" id="soil-moisture-1"></h3>
+            </div>
+          </article>
+        </a>
       </div>
     </div>
 
@@ -51,32 +78,56 @@
     <div class="grid">
       <h2>Node 2</h2>
       <div>
-        <article>
-          <h3>Temperature &deg;C</h3>
-          <p id="temperature-2"></p>
-        </article>
+        <a href="https://wikipedia.com" class="contrast card-link">
+          <article>
+            <div>
+              <h3 class="pico-color-red-250">Temperature</h3>
+            </div>
+            <div>
+              <h3 class="pico-color-red-250" id="temperature-2"> &deg;C</h3>
+            </div>
+          </article>
+        </a>
       </div>
 
       <div>
-        <article>
-          <h3>Humidity (%)</h3>
-          <p id="humidity-2"></p>
-        </article>
+        <a href="https://wikipedia.com" class="contrast card-link">
+          <article>
+            <div>
+              <h3 class="pico-color-blue-250">Humidity</h3>
+            </div>
+            <div>
+              <h3 class="pico-color-blue-250" id="humidity-2">%</h3>
+            </div>
+          </article>
+        </a>
       </div>
 
       <div>
-        <article>
-          <h3>Wind speed (m/s)</h3>
-          <p id="wind-speed-2"></p>
-          <small id="gust-speed-2">with gusts of </small>
-        </article>
+        <a href="https://wikipedia.com" class="contrast card-link">
+          <article>
+            <div>
+              <h3 class="pico-color-cyan-250">Wind speed</h3>
+            </div>
+            <div>
+              <h3 class="pico-color-cyan-250" id="wind-speed-2">m/s</h3>
+              <small class="pico-color-cyan-250" id="gust-speed-2">with gusts of </small>
+            </div>
+          </article>
+        </a>
       </div>
 
       <div>
-        <article>
-          <h3>Soil moisture (raw)</h3>
-          <p id="soil-moisture-2"></p>
-        </article>
+        <a href="https://wikipedia.com" class="contrast card-link">
+          <article>
+            <div>
+              <h3 class="pico-color-jade-250">Soil moisture (raw)</h3>
+            </div>
+            <div>
+              <h3 class="pico-color-jade-250" id="soil-moisture-2"></h3>
+            </div>
+          </article>
+        </a>
       </div>
     </div>
 

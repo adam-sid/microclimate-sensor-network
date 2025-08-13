@@ -65,6 +65,25 @@ app.get('/api/chipping-sodbury', async (req: Request, res: Response) => {
   }
 });
 
+// // async function getCurrentWeather() {
+// //   const url = "https://api.openweathermap.org/data/3.0/onecall?lat=51.5381&lon=-2.3938&exclude=minutely,hourly,daily,alerts&units=metric&appid=" + process.env.WEATHER_KEY;
+// //   const resp = await fetch(url);
+// //   if (!resp.ok) {
+// //     const error = await resp.text();
+// //     throw new Error(error);
+// //   }
+// //   const weather_data = await resp.json();
+
+// //   const latitude
+// //   const longitude
+// //   const temperature = 
+// //   const humidity =
+// //   const wind_speed = 
+// //   const gust_speed =
+// //   const precipitation =
+// //   const 
+// // }
+
 app.listen(port, () => {
   console.log(`Server is live on ${port}`);
 });
