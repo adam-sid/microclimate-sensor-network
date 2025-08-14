@@ -35,7 +35,7 @@ app.post('/api/database/insert-node-data', async (req: Request, res: Response) =
 
   try {
     const query = `INSERT INTO node_data 
-      (node_deployment_id, packet_id, temperature, humidity, 
+      (node_deployment_id, farm_id, packet_id, temperature, humidity, 
       soil_moisture, wind_speed, gust_speed, rssi0, rssi1, snr0, snr1, node_name)
       VALUES (
       (SELECT id FROM node_deployment WHERE node_name = $11 ORDER BY ts DESC LIMIT 1),
