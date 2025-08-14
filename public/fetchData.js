@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
+
+  document.querySelector('#location').insertAdjacentText('beforeend', "Chipping Sodbury")
+
   fetch('/api/chipping-sodbury?column=*&device_id=1')
     .then(res => {
       return res.json();
@@ -14,8 +17,6 @@ document.addEventListener('DOMContentLoaded', () => {
       document.querySelector('#gust-speed-1').insertAdjacentText('beforeend', data.gust_speed + ' m/s')
     })
     .catch(error => console.log(error));
-
-  document.querySelector('#location').insertAdjacentText('beforeend', "Chipping Sodbury")
 
   fetch('/api/chipping-sodbury?column=*&device_id=2')
     .then(res => {
