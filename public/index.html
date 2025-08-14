@@ -6,7 +6,7 @@
   <title>Agriscanner</title>
   <link rel="stylesheet" href="styles/pico.min.css">
   <link rel="stylesheet" href="styles/pico.colors.min.css">
-  <link rel="stylesheet" href="styles/style.css">
+  <link rel="stylesheet" href="styles/custom_style.css">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="fetchData.js"></script>
 </head>
@@ -16,37 +16,40 @@
     <div>
       <h1 id="location">Data for </h1>
     </div>
-
+    <h2>Node 1</h2>
     <div class="grid">
-      <h2>Node 1</h2>
       <div>
-        <a href="temperature.html" class="contrast card-link">
-          <article>
+        <a href="temperature.html" class="card-link red-link">
+          <article class="contrast">
             <div>
               <h3 class="pico-color-red-250">Temperature</h3>
             </div>
             <div>
               <h3 class="pico-color-red-250" id="temperature-1">&deg;C</h3>
+              <!-- Ugly way of formatting cards - hidden repeat of the wind extra detail -->
+              <small style="visibility:hidden">with gusts of 0m/s</small>
             </div>
           </article>
         </a>
       </div>
 
       <div>
-        <a href="https://wikipedia.com" class="contrast card-link">
+        <a href="https://wikipedia.com" class="card-link blue-link">
           <article>
             <div>
               <h3 class="pico-color-blue-250">Humidity</h3>
             </div>
             <div>
               <h3 class="pico-color-blue-250" id="humidity-1">%</h3>
+              <!-- Ugly way of formatting cards - hidden repeat of the wind extra detail -->
+              <small style="visibility:hidden">with gusts of 0m/s</small>
             </div>
           </article>
         </a>
       </div>
 
       <div>
-        <a href="https://wikipedia.com" class="contrast card-link">
+        <a href="https://wikipedia.com" class="card-link cyan-link">
           <article>
             <div>
               <h3 class="pico-color-cyan-250">Wind speed</h3>
@@ -60,51 +63,57 @@
       </div>
 
       <div>
-        <a href="https://wikipedia.com" class="contrast card-link">
+        <a href="https://wikipedia.com" class="card-link jade-link">
           <article>
             <div>
               <h3 class="pico-color-jade-250">Soil moisture (raw)</h3>
             </div>
             <div>
               <h3 class="pico-color-jade-250" id="soil-moisture-1"></h3>
+              <!-- Ugly way of formatting cards - hidden repeat of the wind extra detail -->
+              <small style="visibility:hidden">with gusts of 0m/s</small>
             </div>
           </article>
         </a>
       </div>
     </div>
 
-    <small id="timestamp-1">Last updated: </small>
-
+    <small id="timestamp-1" class="timestamp">Last updated: </small>
+    <h2>Node 2</h2>
     <div class="grid">
-      <h2>Node 2</h2>
+
       <div>
-        <a href="https://wikipedia.com" class="contrast card-link">
+        <a href="https://wikipedia.com" class="card-link red-link">
           <article>
             <div>
               <h3 class="pico-color-red-250">Temperature</h3>
             </div>
             <div>
               <h3 class="pico-color-red-250" id="temperature-2"> &deg;C</h3>
+              <!-- Ugly way of formatting cards - hidden repeat of the wind extra detail -->
+              <small style="visibility:hidden">with gusts of 0m/s</small>
             </div>
           </article>
         </a>
       </div>
 
       <div>
-        <a href="https://wikipedia.com" class="contrast card-link">
+        <a href="https://wikipedia.com" class="card-link blue-link">
           <article>
             <div>
               <h3 class="pico-color-blue-250">Humidity</h3>
             </div>
             <div>
               <h3 class="pico-color-blue-250" id="humidity-2">%</h3>
+              <!-- Ugly way of formatting cards - hidden repeat of the wind extra detail -->
+              <small style="visibility:hidden">with gusts of 0m/s</small>
             </div>
           </article>
         </a>
       </div>
 
       <div>
-        <a href="https://wikipedia.com" class="contrast card-link">
+        <a href="https://wikipedia.com" class="card-link cyan-link">
           <article>
             <div>
               <h3 class="pico-color-cyan-250">Wind speed</h3>
@@ -118,20 +127,22 @@
       </div>
 
       <div>
-        <a href="https://wikipedia.com" class="contrast card-link">
+        <a href="https://wikipedia.com" class="card-link jade-link">
           <article>
             <div>
               <h3 class="pico-color-jade-250">Soil moisture (raw)</h3>
             </div>
             <div>
               <h3 class="pico-color-jade-250" id="soil-moisture-2"></h3>
+              <!-- Ugly way of formatting cards - hidden repeat of the wind extra detail -->
+              <small style="visibility:hidden">with gusts of 0m/s</small>
             </div>
           </article>
         </a>
       </div>
     </div>
 
-    <small id="timestamp-2">Last updated: </small>
+    <small id="timestamp-2" class="timestamp">Last updated: </small>
   </main>
 </body>
 

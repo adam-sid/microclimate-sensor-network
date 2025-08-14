@@ -1,0 +1,58 @@
+.grid>*>a {
+    display: block;
+    height: 100%;
+}
+
+.grid article {
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+}
+
+.timestamp {
+    display: block;
+    margin-top: 0.75rem;
+}
+
+.pico-color-red-250 {
+    color: #f5a390;
+}
+
+.pico-color-blue-250 {
+    color: #aeb5fb;
+}
+
+.pico-color-cyan-250 {
+    color: #0ccece;
+}
+
+.pico-color-jade-250 {
+    color: #00cc88;
+}
+
+.card-link {
+    transition: background-color 0.2s ease;
+    text-decoration: none;
+    display: block;
+}
+
+.red-link:hover article,
+.red-link:active article {
+    background-color: rgba(245, 163, 144, 0.1);
+}
+
+.blue-link:hover article,
+.blue-link:active article {
+    background-color: rgba(174, 181, 251, 0.1);
+}
+
+.cyan-link:hover article,
+.cyan-link:active article {
+    background-color: rgba(12, 206, 206, 0.1);
+}
+
+.jade-link:hover article,
+.jade-link:active article {
+    background-color: rgba(0, 204, 136, 0.1);
+}

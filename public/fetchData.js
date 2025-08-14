@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
       document.querySelector('#soil-moisture-1').insertAdjacentText('afterbegin', data.soil_moisture)
       const britishTime = new Date(data.ts * 1000).toLocaleString('en-GB', { timeZone: 'Europe/London' });
       document.querySelector('#timestamp-1').insertAdjacentText('beforeend', britishTime)
-      document.querySelector('#gust-speed-1').insertAdjacentText('beforeend', data.gust_speed + ' m/s')
+      document.querySelector('#gust-speed-1').insertAdjacentText('beforeend', data.gust_speed + 'm/s')
     })
     .catch(error => console.log(error));
 
@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
       document.querySelector('#soil-moisture-2').insertAdjacentText('afterbegin', data.soil_moisture)
       const britishTime = new Date(data.ts * 1000).toLocaleString('en-GB', { timeZone: 'Europe/London' });
       document.querySelector('#timestamp-2').insertAdjacentText('beforeend', britishTime)
-      document.querySelector('#gust-speed-2').insertAdjacentText('beforeend', data.gust_speed + ' m/s')
+      document.querySelector('#gust-speed-2').insertAdjacentText('beforeend', data.gust_speed + 'm/s')
     })
     .catch(error => console.log(error));
 });
