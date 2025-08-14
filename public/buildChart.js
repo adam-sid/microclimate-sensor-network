@@ -37,4 +37,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     chart.setOption(option);
+
+    window.addEventListener('resize', () => {
+        chart.resize();
+    });
 });
