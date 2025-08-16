@@ -12,17 +12,17 @@
 </head>
 
 <body>
-    <main class="container" chart-type="temperature">
+    <main class="container" chart-type="humidity">
         <nav aria-label="breadcrumb" style="--pico-nav-breadcrumb-divider: '✨';">
             <ul>
                 <li><a href="/" style="color: var(--pico-contrast);">Home</a></li>
-                <li><a href="/temperature" style="color: var(--pico-contrast);">Temperature</a></li>
+                <li><a href="/humidity" style="color: var(--pico-contrast);">Humidity</a></li>
             </ul>
         </nav>
         <header>
             <div class="grid secondary">
                 <div>
-                    <h2 class="pico-color-red-250 node-select"></h2>
+                    <h2 class="pico-color-blue-250 node-select"></h2>
                 </div>
                 <div>
                     <fieldset role="group" class="node-tick-box secondary">
@@ -33,7 +33,7 @@
                 </div>
             </div>
         </header>
-        <div class="temperature-chart chart"></div>
+        <div class="humidity-chart chart"></div>
 
         <div class="grid date-buttons">
             <button id="go-back" class="secondary">&lt;</button>

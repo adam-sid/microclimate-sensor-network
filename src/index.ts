@@ -6,7 +6,7 @@ import { pool } from './db'
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use(express.static('public'));
+app.use(express.static("public", { extensions: ["html"] }));
 app.use(express.json());
 
 const tableNameWhiteList = new Set(['node_data',]);
@@ -100,7 +100,7 @@ app.get('/api/database/select-node-range', async (req: Request, res: Response) =
 
   try {
     const all_data = await pool.query(
-      'SELECT * FROM ${requestedTable} WHERE node_name = $1 AND ts BETWEEN $2 AND $3 ORDER BY ts ASC;`',
+      `SELECT * FROM ${requestedTable} WHERE node_name = $1 AND ts BETWEEN $2 AND $3 ORDER BY ts ASC;`,
       [nodeName, startTime, endTime]
     )
     res.status(200).json(all_data.rows);

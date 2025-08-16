@@ -15,6 +15,11 @@
     margin-top: 0.75rem;
 }
 
+.chart {
+    width: 100%;
+    height: 70vh;
+}
+
 .pico-color-red-250 {
     color: #f5a390;
 }
@@ -55,4 +60,30 @@
 .jade-link:hover article,
 .jade-link:active article {
     background-color: rgba(0, 204, 136, 0.1);
+}
+
+#date-to-display {
+    text-align: center;
+    margin: 0;
+    margin-top: 0.3rem;
+    margin-bottom: 0.3rem;
+}
+
+.date-buttons {
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    max-width: 45%;
+    margin: 1rem auto;
+}
+
+/* 1) center the row */
+.node-tick-box[role="group"] {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+}
+
+/* 2) stop the labels from stretching full-width */
+.node-tick-box[role="group"]>label {
+    flex: 0 0 auto !important;
 }
