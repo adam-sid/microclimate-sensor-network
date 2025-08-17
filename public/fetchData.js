@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
   fetchData(false);
 
   const TWO_MINUTES = 2 * 60 * 1000;
-  setInterval(fetchData, TWO_MINUTES);
+  setInterval(fetchData(true), TWO_MINUTES);
 });
 
 function fetchData(isReload) {
