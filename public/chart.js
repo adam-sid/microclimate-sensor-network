@@ -7,7 +7,7 @@ let displayedNodes = [];
 if (selectedNode !== '3') {
     displayedNodes = [selectedNode];
 } else {
-    displayedNodes = ['1', '2']; // keep types consistent
+    displayedNodes = ['1', '2'];
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -61,15 +61,10 @@ function displayChart() {
 
     //handle graph title
     if (displayedNodes.length == 1) {
-        document.querySelector('.node-select').textContent = `${config.name} for node ${displayedNodes[0]}`;
+        document.querySelector('.sensor-select').textContent = `${config.name}`;
     }
     else if (displayedNodes.length == 2) {
-        document.querySelector('.node-select').textContent = `${config.name} for nodes ${displayedNodes[0]} and ${displayedNodes[1]}`;
-    }
-    else {
-        document.querySelector('.node-select').textContent = "Select node to display chart"
-        buildChart(chartDom, [], config, startTime, endTime);
-        return;
+        document.querySelector('.sensor-select').textContent = `${config.name}`;
     }
 
     if (displayedNodes.length == 1) {
@@ -158,50 +153,77 @@ function getChartConfig(chartType) {
 async function buildChart(chartDom, datasets, config, startTime, endTime) {
     const chart = echarts.getInstanceByDom(chartDom) || echarts.init(chartDom);
     const isWind = config.id == 'wind_speed'
+    const isMobile = window.innerWidth < 768;
 
-    let windHourlyArr1 = [];
-    let windHourlyArr2 = [];
-    if (isWind) {
-        typeOfChart = "scatter"
-        windHourlyArr1 = await getHourlyWind(startTime, endTime, datasets[0].node);
-        if (datasets[1]) {
-            windHourlyArr2 = await getHourlyWind(startTime, endTime, datasets[1].node);
-        }
-    }
+    let series = [];
+
     const sensorData1 = datasets[0].data.map(row => [
         new Date(row.ts * 1000),
         row[config.id]
     ]);
 
-    const series = [{
-        type: isWind ? 'scatter' : 'line',
-        data: sensorData1,
-        name: `Node ${datasets[0].node}`,
-        smooth: true,
-        lineStyle: {
-            width: 3
-        },
-        symbol: isWind ? 'cross' : 'none',
-        symbolSize: isWind ? 6 : 0,
-        areaStyle: isWind ? undefined : { opacity: 0.35 }
-    }];
+    if (!(isWind && datasets.length == 2)) {
+        console.log("In this function!");
+        series.push({
+            type: isWind ? 'scatter' : 'line',
+            data: sensorData1,
+            name: `Node ${datasets[0].node}`,
+            smooth: true,
+            lineStyle: {
+                width: 3
+            },
+            symbol: isWind ? 'cross' : 'none',
+            symbolSize: isWind ? 2 : 0,
+            areaStyle: isWind ? undefined : { opacity: 0.35 },
+            tooltip: isWind ? { show: false } : undefined
+        });
+    }
+
+    let windAverages1 = [];
+    let gustMaxes1 = [];
+    let windAverages2 = [];
+    let gustMaxes2 = [];
+    if (isWind) {
+        const windResult1 = await getHourlyWind(startTime, endTime, datasets[0].node);
+        windAverages1 = windResult1.windAverages;
+        gustMaxes1 = windResult1.gustMaxes;
+        if (datasets[1]) {
+            const windResult2 = await getHourlyWind(startTime, endTime, datasets[1].node);
+            windAverages2 = windResult2.windAverages;
+            gustMaxes2 = windResult2.gustMaxes;
+        }
+    }
 
     if (isWind) {
         series.push({
-            name: `Node ${datasets[0].node} average`,
+            name: `Node ${datasets[0].node} avg         `,
             type: 'line',
-            data: windHourlyArr1,
+            data: windAverages1,
             smooth: true,
             symbol: 'none',
-            lineStyle: { width: 4, type: 'dashed' }
+            lineStyle: {
+                width: 4, type: 'dashed',
+                color: datasets.length == 1 ? "#6F277D" : undefined
+            },
+        });
+        series.push({
+            name: `Node ${datasets[0].node} gusts`,
+            type: 'line',
+            data: gustMaxes1,
+            smooth: true,
+            symbol: 'none',
+            lineStyle: {
+                width: 4, type: 'dashed',
+                color: datasets.length == 1 ? "#AC1C7C" : undefined
+            },
         });
     }
 
     if (datasets.length == 1) {
         const option = {
             grid: {
-                left: 25,
-                right: 25,
+                left: 0,
+                right: 0,
                 top: 25,
                 bottom: 25,
                 containLabel: true
@@ -228,11 +250,7 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
                 }
             },
             series: series,
-            tooltip: {
-                trigger: 'axis',
-                position: (pt) => [pt[0], '1%'],
-            }
-
+            tooltip: { trigger: 'axis' }
         }
 
         chart.setOption(option, true);
@@ -243,33 +261,43 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
             new Date(row.ts * 1000),
             row[config.id]
         ]);
-
-        series.push({
-            name: `Node ${datasets[1].node}`,
-            type: isWind ? 'scatter' : 'line',
-            data: sensorData2,
-            smooth: true,
-            symbol: isWind ? 'circle' : 'none',
-            symbolSize: isWind ? 6 : 0,
-            lineStyle: { width: 3 },
-            areaStyle: isWind ? undefined : { opacity: 0.1 }
-        });
+        if (!isWind) {
+            series.push({
+                name: isWind ? undefined : `Node ${datasets[1].node}`,
+                type: isWind ? 'scatter' : 'line',
+                data: isWind ? undefined : sensorData2,
+                smooth: true,
+                symbol: isWind ? 'circle' : 'none',
+                symbolSize: isWind ? 2 : 0,
+                lineStyle: { width: 3 },
+                areaStyle: isWind ? undefined : { opacity: 0.1 },
+                tooltip: isWind ? { show: false } : undefined
+            });
+        }
 
         if (isWind) {
             series.push({
-                name: `Node ${datasets[1].node} average`,
+                name: `Node ${datasets[1].node} avg         `,
                 type: 'line',
-                data: windHourlyArr2,
+                data: windAverages2,
                 smooth: true,
                 symbol: 'none',
-                lineStyle: { width: 4, type: 'dashed' }
+                lineStyle: { width: 4, type: 'dashed' },
+            });
+            series.push({
+                name: `Node ${datasets[1].node} gusts`,
+                type: 'line',
+                data: gustMaxes2,
+                smooth: true,
+                symbol: 'none',
+                lineStyle: { width: 4, type: 'dashed' },
             });
         }
 
         const option = {
             grid: {
-                left: 25,
-                right: 25,
+                left: 0,
+                right: 0,
                 top: 25,
                 bottom: 50,
                 containLabel: true
@@ -279,11 +307,11 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
                 bottom: 0,
                 icon: 'rect',
                 left: 'center',
-                itemWidth: 19,
-                itemHeight: 19,
-                itemGap: 50,
+                itemWidth: 25,
+                itemHeight: isMobile ? 9 : 19,
+                itemGap: isMobile ? 14 : 50,
                 textStyle: {
-                    fontSize: 25,
+                    fontSize: isMobile ? 13 : 25,
                     fontWeight: 'bold'
                 }
             },
@@ -297,10 +325,7 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
                 axisLabel: { formatter: `{value} ${config.unit}` }
             },
             series: series,
-            tooltip: {
-                trigger: 'axis',
-                position: (pt) => [pt[0], '1%'],
-            }
+            tooltip: { trigger: 'axis', }
         };
         chart.setOption(option, true);
 
@@ -314,7 +339,8 @@ async function getHourlyWind(startTime, endTime, node) {
 
     let loopCountStart = startTime - (0.5 * HOUR_IN_SECS);
     let loopCountEnd = startTime + (0.5 * HOUR_IN_SECS);
-    const windHourlyArr = [];
+    const windAverages = [];
+    const gustMaxes = [];
 
     let count = 0;
     while (loopCountEnd <= endTime + (0.5 * HOUR_IN_SECS)) {
@@ -322,21 +348,27 @@ async function getHourlyWind(startTime, endTime, node) {
             const response = await fetch(`/api/database/select-node-range?requestedTable=node_data&start=${loopCountStart}&end=${loopCountEnd}&node=${node}`);
             const data = await response.json();
             if (data.length == 0) {
-                windHourlyArr.push([new Date((loopCountStart + (0.5 * HOUR_IN_SECS)) * 1000), null]);
-                console.log(windHourlyArr[count]);
+                windAverages.push([new Date((loopCountStart + (0.5 * HOUR_IN_SECS)) * 1000), null]);
+                gustMaxes.push([new Date((loopCountStart + (0.5 * HOUR_IN_SECS)) * 1000), null]);
+                console.log(windAverages[count]);
             } else {
-                let sum = 0, n = 0;
+                let windSum = 0, gustMax = 0, n = 0;
                 for (let i = 0; i < data.length; i++) {
-                    sum += data[i].wind_speed;
+                    windSum += data[i].wind_speed;
+                    if (data[i].gust_speed > gustMax) {
+                        gustMax = data[i].gust_speed;
+                    }
                     n++;
                 }
-                const average = sum / n;
-                windHourlyArr.push([new Date((loopCountStart + (0.5 * HOUR_IN_SECS)) * 1000), average]);
-                console.log(windHourlyArr[count]);
+                const average = Math.round((windSum / n) * 10) / 10;
+                windAverages.push([new Date((loopCountStart + (0.5 * HOUR_IN_SECS)) * 1000), average]);
+                gustMaxes.push([new Date((loopCountStart + (0.5 * HOUR_IN_SECS)) * 1000), gustMax]);
+                console.log(windAverages[count]);
             }
         } catch (error) {
             console.error(`Failed to fetch hourly data`, error);
-            windHourlyArr.push([new Date((loopCountStart + (0.5 * HOUR_IN_SECS)) * 1000), null]);
+            windAverages.push([new Date((loopCountStart + (0.5 * HOUR_IN_SECS)) * 1000), null]);
+            gustMaxes.push([new Date((loopCountStart + (0.5 * HOUR_IN_SECS)) * 1000), null]);
         }
 
         loopCountStart += HOUR_IN_SECS;
@@ -344,7 +376,8 @@ async function getHourlyWind(startTime, endTime, node) {
         count++;
     }
 
-    return windHourlyArr;
+
+    return { windAverages, gustMaxes };
 }
 
 

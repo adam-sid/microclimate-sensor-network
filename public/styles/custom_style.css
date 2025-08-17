@@ -17,7 +17,7 @@
 
 .chart {
     width: 100%;
-    height: 70vh;
+    height: 65vh;
 }
 
 .pico-color-red-250 {
@@ -72,18 +72,17 @@
 .date-buttons {
     grid-template-columns: auto 1fr auto;
     align-items: center;
-    max-width: 45%;
+    max-width: 85%;
     margin: 1rem auto;
 }
 
-/* 1) center the row */
+
 .node-tick-box[role="group"] {
     display: flex;
     justify-content: center;
     gap: 1.5rem;
 }
 
-/* 2) stop the labels from stretching full-width */
 .node-tick-box[role="group"]>label {
     flex: 0 0 auto !important;
 }
