@@ -163,7 +163,6 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
     ]);
 
     if (!(isWind && datasets.length == 2)) {
-        console.log("In this function!");
         series.push({
             type: isWind ? 'scatter' : 'line',
             data: sensorData1,
@@ -339,45 +338,63 @@ async function getHourlyWind(startTime, endTime, node) {
 
     let loopCountStart = startTime - (0.5 * HOUR_IN_SECS);
     let loopCountEnd = startTime + (0.5 * HOUR_IN_SECS);
+
     const windAverages = [];
     const gustMaxes = [];
 
+    let data;
+    try {
+        const response = await fetch(`/api/database/select-node-range?requestedTable=node_data&start=${loopCountStart}&end=${endTime + 0.5 * HOUR_IN_SECS}&node=${node}`);
+        data = await response.json();
+        console.log(`Received ${data.length} rows of data`);
+    } catch (error) {
+        console.error(`Failed to fetch hourly data`, error);
+        return { windAverages: [], gustMaxes: [] };
+    }
+
+    if (data.length == 0) {
+        console.log("No data for this time period")
+        return { windAverages: [], gustMaxes: [] };
+    }
+
     let count = 0;
+    let i = 0;
     while (loopCountEnd <= endTime + (0.5 * HOUR_IN_SECS)) {
-        try {
-            const response = await fetch(`/api/database/select-node-range?requestedTable=node_data&start=${loopCountStart}&end=${loopCountEnd}&node=${node}`);
-            const data = await response.json();
-            if (data.length == 0) {
-                windAverages.push([new Date((loopCountStart + (0.5 * HOUR_IN_SECS)) * 1000), null]);
-                gustMaxes.push([new Date((loopCountStart + (0.5 * HOUR_IN_SECS)) * 1000), null]);
-                console.log(windAverages[count]);
-            } else {
-                let windSum = 0, gustMax = 0, n = 0;
-                for (let i = 0; i < data.length; i++) {
-                    windSum += data[i].wind_speed;
-                    if (data[i].gust_speed > gustMax) {
-                        gustMax = data[i].gust_speed;
-                    }
-                    n++;
+        if (i >= data.length) {
+            windAverages.push([new Date((loopCountStart + (0.5 * HOUR_IN_SECS)) * 1000), null]);
+            gustMaxes.push([new Date((loopCountStart + (0.5 * HOUR_IN_SECS)) * 1000), null]);
+            console.log(windAverages[count], gustMaxes[count]);
+        } else {
+            let windSum = 0, gustMax = 0, n = 0;
+            while (i < data.length && data[i].ts < loopCountEnd) {
+                windSum += data[i].wind_speed;
+                if (data[i].gust_speed > gustMax) {
+                    gustMax = data[i].gust_speed;
                 }
+                n++;
+                i++;
+            }
+            if (n > 0) {
                 const average = Math.round((windSum / n) * 10) / 10;
                 windAverages.push([new Date((loopCountStart + (0.5 * HOUR_IN_SECS)) * 1000), average]);
                 gustMaxes.push([new Date((loopCountStart + (0.5 * HOUR_IN_SECS)) * 1000), gustMax]);
-                console.log(windAverages[count]);
+                console.log(windAverages[count], gustMaxes[count]);
+            } else {
+                windAverages.push([new Date((loopCountStart + (0.5 * HOUR_IN_SECS)) * 1000), null]);
+                gustMaxes.push([new Date((loopCountStart + (0.5 * HOUR_IN_SECS)) * 1000), null]);
+                console.log(windAverages[count], gustMaxes[count]);
             }
-        } catch (error) {
-            console.error(`Failed to fetch hourly data`, error);
-            windAverages.push([new Date((loopCountStart + (0.5 * HOUR_IN_SECS)) * 1000), null]);
-            gustMaxes.push([new Date((loopCountStart + (0.5 * HOUR_IN_SECS)) * 1000), null]);
         }
-
         loopCountStart += HOUR_IN_SECS;
         loopCountEnd += HOUR_IN_SECS;
         count++;
+        console.log(`loop ${count} completed`)
     }
-
 
     return { windAverages, gustMaxes };
 }
+
+
+
 
 
