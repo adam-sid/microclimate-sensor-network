@@ -166,7 +166,7 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
         series.push({
             type: isWind ? 'scatter' : 'line',
             data: sensorData1,
-            name: `Node ${datasets[0].node}`,
+            name: isWind ? undefined : `Node ${datasets[0].node}`,
             smooth: true,
             lineStyle: {
                 width: 3
@@ -195,14 +195,14 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
 
     if (isWind) {
         series.push({
-            name: `Node ${datasets[0].node} avg         `,
+            name: `Node ${datasets[0].node} avg`,
             type: 'line',
             data: windAverages1,
             smooth: true,
             symbol: 'none',
+            color: datasets.length == 1 ? "#6F277D" : "#5070dd",
             lineStyle: {
-                width: 4, type: 'dashed',
-                color: datasets.length == 1 ? "#6F277D" : undefined
+                width: 4, color: datasets.length == 1 ? "#6F277D" : "#5070dd",
             },
         });
         series.push({
@@ -211,9 +211,9 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
             data: gustMaxes1,
             smooth: true,
             symbol: 'none',
+            color: datasets.length == 1 ? "#AC1C7C" : "#42ccdb",
             lineStyle: {
-                width: 4, type: 'dashed',
-                color: datasets.length == 1 ? "#AC1C7C" : undefined
+                width: 4, color: datasets.length == 1 ? "#AC1C7C" : "#42ccdb",
             },
         });
     }
@@ -224,7 +224,7 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
                 left: 0,
                 right: 0,
                 top: 25,
-                bottom: 25,
+                bottom: isWind ? 50 : 25,
                 containLabel: true
             },
             //set colour gradient using visual map
@@ -251,8 +251,11 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
             series: series,
             tooltip: { trigger: 'axis' }
         }
-
         chart.setOption(option, true);
+
+        if (isWind) {
+            applyMobileLegendStyle(chart);
+        }
 
     } else if (datasets.length == 2) {
 
@@ -276,12 +279,13 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
 
         if (isWind) {
             series.push({
-                name: `Node ${datasets[1].node} avg         `,
+                name: `Node ${datasets[1].node} avg`,
                 type: 'line',
                 data: windAverages2,
                 smooth: true,
                 symbol: 'none',
-                lineStyle: { width: 4, type: 'dashed' },
+                lineStyle: { width: 4 },
+                color: "#b6d634"
             });
             series.push({
                 name: `Node ${datasets[1].node} gusts`,
@@ -289,7 +293,8 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
                 data: gustMaxes2,
                 smooth: true,
                 symbol: 'none',
-                lineStyle: { width: 4, type: 'dashed' },
+                lineStyle: { width: 4 },
+                color: "#ff994d"
             });
         }
 
@@ -303,13 +308,6 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
             },
             legend: {
                 data: series.map(s => s.name),
-                bottom: 0,
-                icon: 'rect',
-                left: 'center',
-                itemWidth: 25,
-                textStyle: {
-                    fontWeight: 'bold'
-                }
             },
             xAxis: {
                 type: 'time',
@@ -343,9 +341,17 @@ function applyMobileLegendStyle(chart) {
     const mobileScreen = width <= 700;
     chart.setOption({
         legend: {
+            bottom: 0,
+            icon: 'rect',
+            left: 'center',
+            itemWidth: 25,
+            textStyle: {
+                fontWeight: 'bold',
+                fontSize: mobileScreen ? 13 : smallScreen ? 18 : 25
+            },
             itemHeight: mobileScreen ? 9 : smallScreen ? 14 : 19,
             itemGap: mobileScreen ? 14 : smallScreen ? 28 : 50,
-            textStyle: { fontSize: mobileScreen ? 13 : smallScreen ? 18 : 25 }
+
         },
     }, false);
 }
