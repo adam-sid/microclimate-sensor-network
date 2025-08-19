@@ -146,6 +146,7 @@ function getChartConfig(chartType) {
                 unit: "n/a"
             };
         default:
+            console.log(`Case ${chartType} is unknown`);
             return null;
     }
 }
@@ -200,6 +201,7 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
             data: windAverages1,
             smooth: true,
             symbol: 'none',
+            itemStyle: { color: datasets.length == 1 ? "#6F277D" : "#5070dd" },
             color: datasets.length == 1 ? "#6F277D" : "#5070dd",
             lineStyle: {
                 width: 4, color: datasets.length == 1 ? "#6F277D" : "#5070dd",
@@ -211,6 +213,7 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
             data: gustMaxes1,
             smooth: true,
             symbol: 'none',
+            itemStyle: { color: datasets.length == 1 ? "#AC1C7C" : "#42ccdb" },
             color: datasets.length == 1 ? "#AC1C7C" : "#42ccdb",
             lineStyle: {
                 width: 4, color: datasets.length == 1 ? "#AC1C7C" : "#42ccdb",
@@ -228,7 +231,7 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
                 containLabel: true
             },
             //set colour gradient using visual map
-            visualMap: {
+            visualMap: isWind ? undefined : {
                 show: false,
                 min: config.min,
                 max: config.max,
