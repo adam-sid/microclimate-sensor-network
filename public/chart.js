@@ -307,10 +307,7 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
                 icon: 'rect',
                 left: 'center',
                 itemWidth: 25,
-                itemHeight: isMobile ? 9 : 19,
-                itemGap: isMobile ? 14 : 50,
                 textStyle: {
-                    fontSize: isMobile ? 13 : 25,
                     fontWeight: 'bold'
                 }
             },
@@ -326,12 +323,30 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
             series: series,
             tooltip: { trigger: 'axis', }
         };
-        chart.setOption(option, true);
 
+        chart.setOption(option, true);
+        applyMobileLegendStyle(chart)
     }
     //resize on window change
-    window.addEventListener('resize', () => { chart.resize(); });
+    window.addEventListener('resize', () => {
+        chart.resize();
+        applyMobileLegendStyle(chart);
+        console.log(chart.getWidth());
+    });
 };
+
+function applyMobileLegendStyle(chart) {
+    const width = chart.getWidth();
+    const smallScreen = width > 700 && width < 1200;;
+    const mobileScreen = width <= 700;
+    chart.setOption({
+        legend: {
+            itemHeight: mobileScreen ? 9 : smallScreen ? 14 : 19,
+            itemGap: mobileScreen ? 14 : smallScreen ? 28 : 50,
+            textStyle: { fontSize: mobileScreen ? 13 : smallScreen ? 18 : 25 }
+        },
+    }, false);
+}
 
 async function getHourlyWind(startTime, endTime, node) {
     const HOUR_IN_SECS = 60 * 60;
