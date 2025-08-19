@@ -330,7 +330,9 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
     //resize on window change
     window.addEventListener('resize', () => {
         chart.resize();
-        applyMobileLegendStyle(chart);
+        if (datasets.length == 2) {
+            applyMobileLegendStyle(chart);
+        }
         console.log(chart.getWidth());
     });
 };
