@@ -328,7 +328,7 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
     //resize on window change
     window.addEventListener('resize', () => {
         chart.resize();
-        if (datasets.length == 2) {
+        if (datasets.length == 2 || isWind) {
             applyMobileLegendStyle(chart);
         }
         console.log(chart.getWidth());
