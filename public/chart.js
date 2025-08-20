@@ -14,6 +14,8 @@ if (selectedNode !== '3') {
     displayedNodes = ['1', '2'];
 }
 
+const isTouchDevice = navigator.maxTouchPoints > 0;
+
 const HOUR_IN_MS = 60 * 60 * 1000;
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -166,8 +168,6 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
     const startTimeMs = startTime * 1000;
     const endTimeMs = endTime * 1000;
 
-
-
     let series = [];
 
     const sensorData1 = datasets[0].data.map(row => [
@@ -274,12 +274,12 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
                     //size of chart
                     const chartWidth = chart.getWidth();
                     //if tooltip is not hitting edge of graph
-                    let x = point[0] + 20;
+                    let x = point[0] + (isTouchDevice ? 20 : 0);
                     //else
                     if (x + tooltipWidth > chartWidth) {
-                        x = point[0] - tooltipWidth - 20;
+                        x = point[0] - tooltipWidth - (isTouchDevice ? 20 : 0);
                     }
-                    return [x, point[1] - tooltipHeight - 20];
+                    return [x, point[1] - tooltipHeight - (isTouchDevice ? 20 : 0)];
                 }
             }
         }
