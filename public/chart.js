@@ -10,6 +10,8 @@ if (selectedNode !== '3') {
     displayedNodes = ['1', '2'];
 }
 
+const HOUR_IN_MS = 60 * 60 * 1000;
+
 document.addEventListener('DOMContentLoaded', () => {
     //select the node being displayed at start
     document.getElementById(`node${selectedNode}`).checked = true;
@@ -157,7 +159,6 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
 
     const startTimeMs = startTime * 1000;
     const endTimeMs = endTime * 1000;
-    const HOUR_IN_MS = 60 * 60 * 1000;
 
     let series = [];
 
@@ -247,33 +248,24 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
                 type: 'time',
                 min: startTimeMs,
                 max: endTimeMs,
-                axisLabel: {
-                    formatter: '{HH}:{mm}',
-                    customValues: [startTimeMs, startTimeMs + 3 * HOUR_IN_MS,
-                        startTimeMs + 6 * HOUR_IN_MS, startTimeMs + 9 * HOUR_IN_MS,
-                        startTimeMs + 12 * HOUR_IN_MS, startTimeMs + 15 * HOUR_IN_MS,
-                        startTimeMs + 18 * HOUR_IN_MS, startTimeMs + 21 * HOUR_IN_MS]
-                },
-                axisTick: {
-                    alignWithLabel: true,
-                    customValues: [startTimeMs, startTimeMs + 3 * HOUR_IN_MS,
-                        startTimeMs + 6 * HOUR_IN_MS, startTimeMs + 9 * HOUR_IN_MS,
-                        startTimeMs + 12 * HOUR_IN_MS, startTimeMs + 15 * HOUR_IN_MS,
-                        startTimeMs + 18 * HOUR_IN_MS, startTimeMs + 21 * HOUR_IN_MS]
-                },
-                boundaryGap: true
             },
             yAxis: {
                 type: 'value',
                 axisLabel: {
-                    formatter: `{value} ${config.unit}`
+                    formatter: `{value} ${config.unit}`,
+                    fontWeight: "bold",
                 }
             },
             series: series,
-            tooltip: { trigger: 'axis' }
+            tooltip: {
+                trigger: 'axis',
+                position: function (point) {
+                    return [point[0] + 10, point[1] - 100];
+                }
+            }
         }
         chart.setOption(option, true);
-
+        updateAxisOnResize(chart, startTimeMs);
         if (isWind) {
             applyMobileLegendStyle(chart);
         }
@@ -334,12 +326,49 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
                 type: 'time',
                 min: startTimeMs,
                 max: endTimeMs,
+            },
+            yAxis: {
+                type: 'value',
+                axisLabel: { formatter: `{value} ${config.unit}`, fontWeight: "bold" }
+            },
+            series: series,
+            tooltip: {
+                trigger: 'axis',
+                position: function (point) {
+                    return [point[0] + 10, point[1] - 100];
+                }
+            }
+        };
+
+        chart.setOption(option, true);
+        updateAxisOnResize(chart, startTimeMs);
+        applyMobileLegendStyle(chart);
+    }
+    //resize on window change
+    window.addEventListener('resize', () => {
+        chart.resize();
+        updateAxisOnResize(chart, startTimeMs);
+        if (datasets.length == 2 || isWind) {
+            applyMobileLegendStyle(chart);
+        }
+        console.log(chart.getWidth());
+    });
+};
+
+function updateAxisOnResize(chart, startTimeMs) {
+    const width = chart.getWidth();
+    const mobileScreen = width <= 700;
+    if (!mobileScreen) {
+        console.log("Applying desktop axis");
+        chart.setOption({
+            xAxis: [{
                 axisLabel: {
                     formatter: '{HH}:{mm}',
                     customValues: [startTimeMs, startTimeMs + 3 * HOUR_IN_MS,
                         startTimeMs + 6 * HOUR_IN_MS, startTimeMs + 9 * HOUR_IN_MS,
                         startTimeMs + 12 * HOUR_IN_MS, startTimeMs + 15 * HOUR_IN_MS,
-                        startTimeMs + 18 * HOUR_IN_MS, startTimeMs + 21 * HOUR_IN_MS]
+                        startTimeMs + 18 * HOUR_IN_MS, startTimeMs + 21 * HOUR_IN_MS],
+                    fontWeight: "bold",
                 },
                 axisTick: {
                     alignWithLabel: true,
@@ -348,28 +377,40 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
                         startTimeMs + 12 * HOUR_IN_MS, startTimeMs + 15 * HOUR_IN_MS,
                         startTimeMs + 18 * HOUR_IN_MS, startTimeMs + 21 * HOUR_IN_MS]
                 },
-                boundaryGap: true
-            },
-            yAxis: {
-                type: 'value',
-                axisLabel: { formatter: `{value} ${config.unit}` }
-            },
-            series: series,
-            tooltip: { trigger: 'axis', }
-        };
+                splitLine: {
+                    show: true,
+                    lineStyle: { opacity: 0.1 }
+                }
+            }]
+        }, false);
+    } else {
+        console.log("Applying mobile axis");
+        chart.setOption({
+            xAxis: [{
+                axisLabel: {
+                    formatter: '{HH}:{mm}',
+                    customValues: [startTimeMs,
+                        startTimeMs + 6 * HOUR_IN_MS,
+                        startTimeMs + 12 * HOUR_IN_MS,
+                        startTimeMs + 18 * HOUR_IN_MS],
+                    fontWeight: "bold",
+                },
+                axisTick: {
+                    alignWithLabel: true,
+                    customValues: [startTimeMs,
+                        startTimeMs + 6 * HOUR_IN_MS,
+                        startTimeMs + 12 * HOUR_IN_MS,
+                        startTimeMs + 18 * HOUR_IN_MS]
+                },
+                splitLine: {
+                    show: true,
+                    lineStyle: { opacity: 0.1 }
+                },
 
-        chart.setOption(option, true);
-        applyMobileLegendStyle(chart)
+            }]
+        }, false);
     }
-    //resize on window change
-    window.addEventListener('resize', () => {
-        chart.resize();
-        if (datasets.length == 2 || isWind) {
-            applyMobileLegendStyle(chart);
-        }
-        console.log(chart.getWidth());
-    });
-};
+}
 
 function applyMobileLegendStyle(chart) {
     const width = chart.getWidth();
@@ -382,7 +423,7 @@ function applyMobileLegendStyle(chart) {
             left: 'center',
             itemWidth: 25,
             textStyle: {
-                fontWeight: 'bold',
+                fontWeight: 'bolder',
                 fontSize: mobileScreen ? 13 : smallScreen ? 18 : 25
             },
             itemHeight: mobileScreen ? 9 : smallScreen ? 14 : 19,
@@ -422,7 +463,6 @@ async function getHourlyWind(startTime, endTime, node) {
         if (i >= data.length) {
             windAverages.push([new Date((loopCountStart + (0.5 * HOUR_IN_SECS)) * 1000), null]);
             gustMaxes.push([new Date((loopCountStart + (0.5 * HOUR_IN_SECS)) * 1000), null]);
-            console.log(windAverages[count], gustMaxes[count]);
         } else {
             let windSum = 0, gustMax = 0, n = 0;
             while (i < data.length && data[i].ts < loopCountEnd) {
@@ -437,22 +477,18 @@ async function getHourlyWind(startTime, endTime, node) {
                 const average = Math.round((windSum / n) * 10) / 10;
                 windAverages.push([new Date((loopCountStart + (0.5 * HOUR_IN_SECS)) * 1000), average]);
                 gustMaxes.push([new Date((loopCountStart + (0.5 * HOUR_IN_SECS)) * 1000), gustMax]);
-                console.log(windAverages[count], gustMaxes[count]);
             } else {
                 windAverages.push([new Date((loopCountStart + (0.5 * HOUR_IN_SECS)) * 1000), null]);
                 gustMaxes.push([new Date((loopCountStart + (0.5 * HOUR_IN_SECS)) * 1000), null]);
-                console.log(windAverages[count], gustMaxes[count]);
             }
         }
         loopCountStart += HOUR_IN_SECS;
         loopCountEnd += HOUR_IN_SECS;
         count++;
-        console.log(`loop ${count} completed`)
     }
 
     return { windAverages, gustMaxes };
 }
-
 
 
 
