@@ -3,8 +3,12 @@
 urlQueryParams = new URLSearchParams(window.location.search);
 
 const selectedNode = urlQueryParams.get('node') || '1';
+const selectedDate = urlQueryParams.get('date');
 
-let dateToDisplay = urlQueryParams.get('date') || new Date();
+let dateToDisplay = new Date();
+if (selectedDate) {
+    dateToDisplay = new Date(parseInt(selectedDate) * 1000);
+}
 
 //store nodes to display in an array
 let displayedNodes = [];
@@ -25,17 +29,14 @@ document.addEventListener('DOMContentLoaded', () => {
     displayChart();
 
     document.querySelector('#node-select').addEventListener('change', (e) => {
-        const displayOption = e.target.value;
+        const nodeValue = e.target.value;
+        setNodeDateUrl(nodeValue);
 
-        const url = new URL(window.location);
-        url.searchParams.set('node', displayOption);
-        history.replaceState(null, '', url);
-
-        if (displayOption === '1') {
+        if (nodeValue === '1') {
             displayedNodes = ['1'];
-        } else if (displayOption === '2') {
+        } else if (nodeValue === '2') {
             displayedNodes = ['2'];
-        } else if (displayOption === '3') {
+        } else if (nodeValue === '3') {
             displayedNodes = ['1', '2'];
         } else {
             displayedNodes = [];
@@ -43,18 +44,25 @@ document.addEventListener('DOMContentLoaded', () => {
         displayChart();
     });
 
-
-
     document.getElementById('go-back').addEventListener('click', () => {
         dateToDisplay.setDate(dateToDisplay.getDate() - 1);
+        setNodeDateUrl(document.querySelector('#node-select').value);
         displayChart();
     });
 
     document.getElementById('go-forward').addEventListener('click', () => {
         dateToDisplay.setDate(dateToDisplay.getDate() + 1);
+        setNodeDateUrl(document.querySelector('#node-select').value);
         displayChart();
     });
 });
+
+function setNodeDateUrl(nodeValue) {
+    const url = new URL(window.location);
+    url.searchParams.set('node', nodeValue);
+    url.searchParams.set('date', Math.floor(dateToDisplay.getTime() / 1000));
+    history.replaceState(null, '', url);
+}
 
 function displayChart() {
 
