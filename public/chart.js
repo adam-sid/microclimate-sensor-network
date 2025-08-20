@@ -259,8 +259,19 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
             series: series,
             tooltip: {
                 trigger: 'axis',
-                position: function (point) {
-                    return [point[0] + 10, point[1] - 100];
+                position: function (point, params, dom, rect, size) {
+                    //size of tooltip element
+                    const tooltipWidth = dom.offsetWidth;
+                    const tooltipHeight = dom.offsetHeight;
+                    //size of chart
+                    const chartWidth = chart.getWidth();
+                    //if tooltip is not hitting edge of graph
+                    let x = point[0] + 10;
+                    //else
+                    if (x + tooltipWidth > chartWidth) {
+                        x = point[0] - tooltipWidth - 10;
+                    }
+                    return [x, point[1] - tooltipHeight];
                 }
             }
         }
@@ -334,8 +345,19 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
             series: series,
             tooltip: {
                 trigger: 'axis',
-                position: function (point) {
-                    return [point[0] + 10, point[1] - 100];
+                position: function (point, params, dom, rect, size) {
+                    //size of tooltip element
+                    const tooltipWidth = dom.offsetWidth;
+                    const tooltipHeight = dom.offsetHeight;
+                    //size of chart
+                    const chartWidth = chart.getWidth();
+                    //if tooltip is not hitting edge of graph
+                    let x = point[0] + 10;
+                    //else
+                    if (x + tooltipWidth > chartWidth) {
+                        x = point[0] - tooltipWidth - 10;
+                    }
+                    return [x, point[1] - tooltipHeight];
                 }
             }
         };
