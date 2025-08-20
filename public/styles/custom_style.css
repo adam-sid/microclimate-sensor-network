@@ -17,7 +17,7 @@
 
 .chart {
     width: 100%;
-    height: 60vh;
+    height: 65vh;
 }
 
 .pico-color-red-250 {
@@ -76,40 +76,25 @@
     margin: 1rem auto;
 }
 
-/* Put radios at end of div*/
-.node-tick-box[role="group"] {
-    justify-content: flex-end;
-    gap: 1rem;
-}
-
-/* Force radios to not spread out (override pico default)*/
-.node-tick-box[role="group"]>label {
-    flex: 0 0 auto !important;
-}
-
-/* Put radios and title on same level*/
+/* Put select box and title on same level*/
 .title-container {
     display: flex;
     align-items: center;
 }
 
-/* On mobile make the radios smaller*/
+/* shrink select box*/
+.title-container #node-select {
+    width: auto;
+    margin-left: auto;
+    margin-right: 2rem;
+}
+
+/* On mobile make the chart smaller*/
 @media (max-width: 500px) {
 
-    /* Smaller gap */
-    .node-tick-box[role="group"] {
-        gap: 0.4rem;
+    .chart {
+        width: 100%;
+        height: 55vh;
     }
 
-    /* Make the text inside the labels smaller */
-    .node-tick-box[role="group"]>label {
-        font-size: 0.8rem;
-    }
-
-    /* Make the radio button circle itself smaller */
-    .node-tick-box[role="group"] input[type="radio"] {
-        width: 1em;
-        height: 1em;
-        margin-right: 3px;
-    }
 }

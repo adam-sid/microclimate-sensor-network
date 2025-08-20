@@ -20,11 +20,11 @@ const HOUR_IN_MS = 60 * 60 * 1000;
 
 document.addEventListener('DOMContentLoaded', () => {
     //select the node being displayed at start
-    document.getElementById(`node${selectedNode}`).checked = true;
+    document.querySelector('#node-select').value = selectedNode;
 
     displayChart();
 
-    document.querySelector(".node-tick-box").addEventListener('change', (e) => {
+    document.querySelector('#node-select').addEventListener('change', (e) => {
         const displayOption = e.target.value;
 
         const url = new URL(window.location);
