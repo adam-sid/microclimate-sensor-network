@@ -154,7 +154,10 @@ function getChartConfig(chartType) {
 async function buildChart(chartDom, datasets, config, startTime, endTime) {
     const chart = echarts.getInstanceByDom(chartDom) || echarts.init(chartDom);
     const isWind = config.id == 'wind_speed'
-    const isMobile = window.innerWidth < 768;
+
+    const startTimeMs = startTime * 1000;
+    const endTimeMs = endTime * 1000;
+    const HOUR_IN_MS = 60 * 60 * 1000;
 
     let series = [];
 
@@ -242,8 +245,23 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
             },
             xAxis: {
                 type: 'time',
-                min: startTime * 1000,
-                max: endTime * 1000
+                min: startTimeMs,
+                max: endTimeMs,
+                axisLabel: {
+                    formatter: '{HH}:{mm}',
+                    customValues: [startTimeMs, startTimeMs + 3 * HOUR_IN_MS,
+                        startTimeMs + 6 * HOUR_IN_MS, startTimeMs + 9 * HOUR_IN_MS,
+                        startTimeMs + 12 * HOUR_IN_MS, startTimeMs + 15 * HOUR_IN_MS,
+                        startTimeMs + 18 * HOUR_IN_MS, startTimeMs + 21 * HOUR_IN_MS]
+                },
+                axisTick: {
+                    alignWithLabel: true,
+                    customValues: [startTimeMs, startTimeMs + 3 * HOUR_IN_MS,
+                        startTimeMs + 6 * HOUR_IN_MS, startTimeMs + 9 * HOUR_IN_MS,
+                        startTimeMs + 12 * HOUR_IN_MS, startTimeMs + 15 * HOUR_IN_MS,
+                        startTimeMs + 18 * HOUR_IN_MS, startTimeMs + 21 * HOUR_IN_MS]
+                },
+                boundaryGap: true
             },
             yAxis: {
                 type: 'value',
@@ -314,8 +332,23 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
             },
             xAxis: {
                 type: 'time',
-                min: startTime * 1000,
-                max: endTime * 1000,
+                min: startTimeMs,
+                max: endTimeMs,
+                axisLabel: {
+                    formatter: '{HH}:{mm}',
+                    customValues: [startTimeMs, startTimeMs + 3 * HOUR_IN_MS,
+                        startTimeMs + 6 * HOUR_IN_MS, startTimeMs + 9 * HOUR_IN_MS,
+                        startTimeMs + 12 * HOUR_IN_MS, startTimeMs + 15 * HOUR_IN_MS,
+                        startTimeMs + 18 * HOUR_IN_MS, startTimeMs + 21 * HOUR_IN_MS]
+                },
+                axisTick: {
+                    alignWithLabel: true,
+                    customValues: [startTimeMs, startTimeMs + 3 * HOUR_IN_MS,
+                        startTimeMs + 6 * HOUR_IN_MS, startTimeMs + 9 * HOUR_IN_MS,
+                        startTimeMs + 12 * HOUR_IN_MS, startTimeMs + 15 * HOUR_IN_MS,
+                        startTimeMs + 18 * HOUR_IN_MS, startTimeMs + 21 * HOUR_IN_MS]
+                },
+                boundaryGap: true
             },
             yAxis: {
                 type: 'value',
