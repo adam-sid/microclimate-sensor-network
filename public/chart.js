@@ -112,7 +112,6 @@ function displayChart() {
 function getChartConfig(chartType) {
     switch (chartType) {
         case "temperature":
-            console.log("Returned temp config");
             return {
                 id: "temperature",
                 selector: ".temperature-chart",
@@ -123,7 +122,6 @@ function getChartConfig(chartType) {
                 unit: "°C"
             };
         case "humidity":
-            console.log("Returned humidity config");
             return {
                 id: "humidity",
                 selector: ".humidity-chart",
@@ -134,7 +132,6 @@ function getChartConfig(chartType) {
                 unit: "%"
             };
         case "wind":
-            console.log("Returned wind config");
             return {
                 id: "wind_speed",
                 selector: ".wind-chart",
@@ -145,7 +142,6 @@ function getChartConfig(chartType) {
                 unit: "m/s"
             };
         case "soil":
-            console.log("Returned soil config");
             return {
                 id: "soil_moisture",
                 selector: ".soil-chart",
@@ -390,7 +386,6 @@ function updateAxisOnResize(chart, startTimeMs) {
     const width = chart.getWidth();
     const mobileScreen = width <= 700;
     if (!mobileScreen) {
-        console.log("Applying desktop axis");
         chart.setOption({
             xAxis: [{
                 axisLabel: {
@@ -414,7 +409,6 @@ function updateAxisOnResize(chart, startTimeMs) {
             }]
         }, false);
     } else {
-        console.log("Applying mobile axis");
         chart.setOption({
             xAxis: [{
                 axisLabel: {
