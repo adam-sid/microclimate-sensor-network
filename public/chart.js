@@ -1,7 +1,13 @@
 
 //get the starting node from the url query
-const selectedNode = new URLSearchParams(window.location.search).get('node') || '1';
-let dateToDisplay = new Date();
+urlQueryParams = new URLSearchParams(window.location.search);
+
+const selectedNode = urlQueryParams.get('node') || '1';
+
+let dateToDisplay = urlQueryParams.get('date') || new Date();
+
+let isTouchScreen = false;
+
 //store nodes to display in an array
 let displayedNodes = [];
 if (selectedNode !== '3') {
@@ -15,6 +21,13 @@ const HOUR_IN_MS = 60 * 60 * 1000;
 document.addEventListener('DOMContentLoaded', () => {
     //select the node being displayed at start
     document.getElementById(`node${selectedNode}`).checked = true;
+
+    document.addEventListener('touchstart', () => {
+        isTouchScreen = true;
+    });
+    document.addEventListener('mousemove', () => {
+        isTouchScreen = false;
+    });
 
     displayChart();
 
@@ -36,6 +49,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         displayChart();
     });
+
+
 
     document.getElementById('go-back').addEventListener('click', () => {
         dateToDisplay.setDate(dateToDisplay.getDate() - 1);
@@ -160,6 +175,8 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
     const startTimeMs = startTime * 1000;
     const endTimeMs = endTime * 1000;
 
+
+
     let series = [];
 
     const sensorData1 = datasets[0].data.map(row => [
@@ -259,24 +276,11 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
             series: series,
             tooltip: {
                 trigger: 'axis',
-                position: function (point, params, dom, rect, size) {
-                    //size of tooltip element
-                    const tooltipWidth = dom.offsetWidth;
-                    const tooltipHeight = dom.offsetHeight;
-                    //size of chart
-                    const chartWidth = chart.getWidth();
-                    //if tooltip is not hitting edge of graph
-                    let x = point[0] + 10;
-                    //else
-                    if (x + tooltipWidth > chartWidth) {
-                        x = point[0] - tooltipWidth - 10;
-                    }
-                    return [x, point[1] - tooltipHeight];
-                }
             }
         }
         chart.setOption(option, true);
         updateAxisOnResize(chart, startTimeMs);
+        setTooltip(chart);
         if (isWind) {
             applyMobileLegendStyle(chart);
         }
@@ -345,25 +349,12 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
             series: series,
             tooltip: {
                 trigger: 'axis',
-                position: function (point, params, dom, rect, size) {
-                    //size of tooltip element
-                    const tooltipWidth = dom.offsetWidth;
-                    const tooltipHeight = dom.offsetHeight;
-                    //size of chart
-                    const chartWidth = chart.getWidth();
-                    //if tooltip is not hitting edge of graph
-                    let x = point[0] + 10;
-                    //else
-                    if (x + tooltipWidth > chartWidth) {
-                        x = point[0] - tooltipWidth - 10;
-                    }
-                    return [x, point[1] - tooltipHeight];
-                }
             }
         };
 
         chart.setOption(option, true);
         updateAxisOnResize(chart, startTimeMs);
+        setTooltip(chart);
         applyMobileLegendStyle(chart);
     }
     //resize on window change
@@ -376,6 +367,46 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
         console.log(chart.getWidth());
     });
 };
+
+function setTooltip(chart) {
+
+    if (!isTouchScreen) {
+        chart.setOption({
+            position: function (point, params, dom, rect, size) {
+                //size of tooltip element
+                const tooltipWidth = dom.offsetWidth;
+                const tooltipHeight = dom.offsetHeight;
+                //size of chart
+                const chartWidth = chart.getWidth();
+                //if tooltip is not hitting edge of graph
+                let x = point[0];
+                //else
+                if (x + tooltipWidth > chartWidth) {
+                    x = point[0] - tooltipWidth;
+                }
+                return [x, point[1] - tooltipHeight];
+            }
+        }, false)
+    } else {
+        chart.setOption({
+            position: function (point, params, dom, rect, size) {
+                //size of tooltip element
+                const tooltipWidth = dom.offsetWidth;
+                const tooltipHeight = dom.offsetHeight;
+                //size of chart
+                const chartWidth = chart.getWidth();
+                //if tooltip is not hitting edge of graph
+                let x = point[0] + 20;
+                //else
+                if (x + tooltipWidth > chartWidth) {
+                    x = point[0] - tooltipWidth - 10;
+                }
+                return [x, point[1] - tooltipHeight];
+            }
+        }, false)
+    }
+
+}
 
 function updateAxisOnResize(chart, startTimeMs) {
     const width = chart.getWidth();
