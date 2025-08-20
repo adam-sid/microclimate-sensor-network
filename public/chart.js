@@ -261,7 +261,6 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
                 type: 'value',
                 axisLabel: {
                     formatter: `{value} ${config.unit}`,
-                    fontWeight: "bold",
                 }
             },
             series: series,
@@ -348,7 +347,7 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
             },
             yAxis: {
                 type: 'value',
-                axisLabel: { formatter: `{value} ${config.unit}`, fontWeight: "bold" }
+                axisLabel: { formatter: `{value} ${config.unit}` }
             },
             series: series,
             tooltip: {
@@ -400,7 +399,6 @@ function updateAxisOnResize(chart, startTimeMs) {
                         startTimeMs + 6 * HOUR_IN_MS, startTimeMs + 9 * HOUR_IN_MS,
                         startTimeMs + 12 * HOUR_IN_MS, startTimeMs + 15 * HOUR_IN_MS,
                         startTimeMs + 18 * HOUR_IN_MS, startTimeMs + 21 * HOUR_IN_MS],
-                    fontWeight: "bold",
                 },
                 axisTick: {
                     alignWithLabel: true,
@@ -411,7 +409,7 @@ function updateAxisOnResize(chart, startTimeMs) {
                 },
                 splitLine: {
                     show: true,
-                    lineStyle: { opacity: 0.1 }
+                    lineStyle: { opacity: 0.25 }
                 }
             }]
         }, false);
@@ -425,7 +423,6 @@ function updateAxisOnResize(chart, startTimeMs) {
                         startTimeMs + 6 * HOUR_IN_MS,
                         startTimeMs + 12 * HOUR_IN_MS,
                         startTimeMs + 18 * HOUR_IN_MS],
-                    fontWeight: "bold",
                 },
                 axisTick: {
                     alignWithLabel: true,
@@ -436,7 +433,7 @@ function updateAxisOnResize(chart, startTimeMs) {
                 },
                 splitLine: {
                     show: true,
-                    lineStyle: { opacity: 0.1 }
+                    lineStyle: { opacity: 0.25 }
                 },
 
             }]
