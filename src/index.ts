@@ -1,13 +1,33 @@
-import express from 'express';
-import { Request, Response } from 'express';
+import express, { Request, Response } from 'express';
 import * as dotenv from 'dotenv'
 import { pool } from './db'
+import { error } from 'console';
+import { RequestHandler } from 'express';
 
 const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(express.static("public", { extensions: ["html"] }));
 app.use(express.json());
+
+// use HTTP Authorization header standard RFC6750
+const checkSecretWord: RequestHandler = (req, res, next): void => {
+  const authorisation = req.get('Authorization');
+  if (!authorisation) {
+    res.status(401).json({ error: 'unauthorized' });
+    return;
+  }
+  const token = authorisation.slice(7);
+  if (token != process.env.SECRET_WORD) {
+    res.status(401).json({ error: 'unauthorized' });
+    return;
+  }
+  next();
+}
+app.use('/api', (req, res, next) => {
+  if (req.method === 'GET') return next();
+  return checkSecretWord(req, res, next);
+});
 
 const tableNameWhiteList = new Set(['node_data',]);
 
@@ -110,25 +130,129 @@ app.get('/api/database/select-node-range', async (req: Request, res: Response) =
   }
 });
 
-// // async function getCurrentWeather() {
-// //   const url = "https://api.openweathermap.org/data/3.0/onecall?lat=51.5381&lon=-2.3938&exclude=minutely,hourly,daily,alerts&units=metric&appid=" + process.env.WEATHER_KEY;
-// //   const resp = await fetch(url);
-// //   if (!resp.ok) {
-// //     const error = await resp.text();
-// //     throw new Error(error);
-// //   }
-// //   const weather_data = await resp.json();
+app.post('/api/database/insert-weather-data', async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { farm_id } = req.body
+    const farmId = typeof farm_id === 'string' ? farm_id : '';
+    if (!farmId) {
+      res.status(400).json({ error: 'farm_id query parameter is required' });
+    }
+    let data;
+    if (req.body.time) {
+      data = await getHistoricFarmWeather(farmId, req.body.time);
+    } else {
+      data = await getLatestFarmWeather(farmId);
+    }
 
-// //   const latitude
-// //   const longitude
-// //   const temperature = 
-// //   const humidity =
-// //   const wind_speed = 
-// //   const gust_speed =
-// //   const precipitation =
-// //   const 
-// // }
+    const insertString =
+      `INSERT INTO farm_weather_current (
+    farm_id, ts, sunrise, sunset,
+    temp, feels_like, pressure, humidity, dew_point, uvi, clouds, visibility,
+    wind_speed, wind_deg, wind_gust, rain_1h, snow_1h, weather_id
+    )
+    VALUES (
+      (SELECT farm_id FROM node_deployment ORDER BY ts DESC LIMIT 1),
+      $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, 
+      $15, $16, $17
+    )
+    ON CONFLICT (farm_id, ts) DO NOTHING;`;
+
+    const values = [
+      data.dt ?? null,
+      data.sunrise ?? null,
+      data.sunset ?? null,
+      data.temp ?? null,
+      data.feels_like ?? null,
+      data.pressure ?? null,
+      data.humidity ?? null,
+      data.dew_point ?? null,
+      data.uvi ?? null,
+      data.clouds ?? null,
+      data.visibility ?? null,
+      data.wind_speed ?? null,
+      data.wind_deg ?? null,
+      data.wind_gust ?? null,
+      data.rain?.['1h'] ?? null,
+      data.snow?.['1h'] ?? null,
+      data.weather?.[0]?.id ?? null,
+    ];
+    await pool.query(insertString, values);
+    res.status(200).json({ message: 'Weather data inserted successfully' });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'An internal server error occurred' });
+  }
+});
 
 app.listen(port, () => {
   console.log(`Server is live on ${port}`);
 });
+
+async function getLatestFarmLocation(farmId: string) {
+  if (!farmId) {
+    throw new Error('No farmId given');
+  }
+
+
+
+  const { rows } = await pool.query(
+    'SELECT latitude, longitude FROM farms WHERE id = $1::int LIMIT 1;',
+    [farmId]
+  );
+
+  if (rows.length === 0) {
+    return null;
+  }
+
+  return rows[0];
+}
+
+async function getLatestFarmWeather(farmId: string) {
+
+  const location = await getLatestFarmLocation(farmId);
+  if (!location) {
+    throw new Error('Farm not found');
+  }
+
+  const url = `https://api.openweathermap.org/data/3.0/onecall?lat=${location.latitude}&lon=${location.longitude}&exclude=minutely,hourly,daily,alerts&units=metric&appid=${process.env.WEATHER_KEY}`;
+  const openWeatherRes = await fetch(url);
+  if (!openWeatherRes.ok) {
+    console.log("openWeather API says no:", openWeatherRes.text())
+    throw new Error('Weather API request failed');
+  }
+  const weatherData = await openWeatherRes.json();
+  let data;
+  try {
+    data = weatherData.current;
+  } catch (error) {
+    console.log("Unexpected API response format")
+    throw new Error('Unexpected API response format');
+  }
+  return data;
+}
+
+async function getHistoricFarmWeather(farmId: string, time: string) {
+
+  const location = await getLatestFarmLocation(farmId);
+  if (!location) {
+    throw new Error('Farm not found');
+  }
+
+  const url = `https://api.openweathermap.org/data/3.0/onecall/timemachine?lat=${location.latitude}&lon=${location.longitude}&dt=${time}&units=metric&appid=${process.env.WEATHER_KEY}`;
+
+  const openWeatherRes = await fetch(url);
+  if (!openWeatherRes.ok) {
+    console.log("openWeather API says no:", await openWeatherRes.text())
+    throw new Error('Weather API request failed');
+  }
+  const weatherData = await openWeatherRes.json();
+  let data;
+  try {
+    data = weatherData.data[0];
+  } catch (error) {
+    console.log("Unexpected API response format")
+    throw new Error('Unexpected API response format');
+  }
+  return data;
+}
