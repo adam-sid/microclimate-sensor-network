@@ -262,7 +262,7 @@ async function getAndSendWeather(): Promise<void> {
   const secretWord = process.env.SECRET_WORD;
 
   try {
-    const response = await fetch('https://agriscanner.onrender.com//api/database/insert-weather-data', {
+    const response = await fetch('https://agriscanner.onrender.com/api/database/insert-weather-data', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${secretWord}`,
