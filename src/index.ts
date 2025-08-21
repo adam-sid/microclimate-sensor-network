@@ -282,6 +282,6 @@ async function getAndSendWeather(): Promise<void> {
   }
 };
 
-cron.schedule('*/2 * * * *', () => {
+cron.schedule('*/10 * * * *', () => {
   getAndSendWeather();
 });
