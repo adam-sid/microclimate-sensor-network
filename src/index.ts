@@ -3,6 +3,7 @@ import * as dotenv from 'dotenv'
 import { pool } from './db'
 import { error } from 'console';
 import { RequestHandler } from 'express';
+import cron from 'node-cron';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -194,8 +195,6 @@ async function getLatestFarmLocation(farmId: string) {
     throw new Error('No farmId given');
   }
 
-
-
   const { rows } = await pool.query(
     'SELECT latitude, longitude FROM farms WHERE id = $1::int LIMIT 1;',
     [farmId]
@@ -256,3 +255,33 @@ async function getHistoricFarmWeather(farmId: string, time: string) {
   }
   return data;
 }
+
+async function getAndSendWeather(): Promise<void> {
+  console.log('Running a task every 10 minutes!');
+  const FARM_ID = '1';
+  const secretWord = process.env.SECRET_WORD;
+
+  try {
+    const response = await fetch('http://localhost:3000/api/database/insert-weather-data', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${secretWord}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        farm_id: FARM_ID,
+      }),
+    });
+    if (response.ok) {
+      console.log('Task complete');
+    } else {
+      console.error(`Error: ` + await response.text());
+    }
+  } catch (error) {
+    console.error(`Unknown error`);
+  }
+};
+
+cron.schedule('*/2 * * * *', () => {
+  getAndSendWeather();
+});
