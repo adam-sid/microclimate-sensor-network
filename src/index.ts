@@ -282,7 +282,7 @@ async function getAndSendWeather(): Promise<void> {
   }
 };
 
-async function getForecast(): Promise<void> {
+async function getLatestForecast(): Promise<void> {
   console.log('Running a task every 10 minutes!');
   const FARM_ID = '1';
   const location = await getLatestFarmLocation(FARM_ID);
@@ -308,7 +308,7 @@ async function getForecast(): Promise<void> {
 
   if (data) {
     try {
-      fs.writeFile('LatestForeCast.json', data);
+      await fs.writeFile('src/LatestForeCast.json', JSON.stringify(data));
       console.log("File written successfully");
     } catch (error) {
       console.log(error);
@@ -319,7 +319,7 @@ async function getForecast(): Promise<void> {
 
 };
 
-cron.schedule('*/10 * * * *', () => {
+cron.schedule('*/1 * * * *', () => {
   getAndSendWeather();
-  getForecast();
+  getLatestForecast();
 });
