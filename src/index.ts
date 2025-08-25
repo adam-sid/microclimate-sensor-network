@@ -4,6 +4,7 @@ import { pool } from './db'
 import { error } from 'console';
 import { RequestHandler } from 'express';
 import cron from 'node-cron';
+import { promises as fs } from 'fs';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -260,7 +261,6 @@ async function getAndSendWeather(): Promise<void> {
   console.log('Running a task every 10 minutes!');
   const FARM_ID = '1';
   const secretWord = process.env.SECRET_WORD;
-
   try {
     const response = await fetch('https://agriscanner.onrender.com/api/database/insert-weather-data', {
       method: 'POST',
@@ -282,6 +282,44 @@ async function getAndSendWeather(): Promise<void> {
   }
 };
 
+async function getForecast(): Promise<void> {
+  console.log('Running a task every 10 minutes!');
+  const FARM_ID = '1';
+  const location = await getLatestFarmLocation(FARM_ID);
+  if (!location) {
+    throw new Error('Farm not found');
+  }
+
+  const url = `https://api.openweathermap.org/data/3.0/onecall?lat=${location.latitude}&lon=${location.longitude}&exclude=current,minutely,daily,alerts&units=metric&appid=${process.env.WEATHER_KEY}`;
+
+  const openWeatherRes = await fetch(url);
+  if (!openWeatherRes.ok) {
+    console.log("openWeather API says no:", await openWeatherRes.text())
+    throw new Error('Weather API request failed');
+  }
+  const weatherData = await openWeatherRes.json();
+  let data;
+  try {
+    data = weatherData.hourly;
+  } catch (error) {
+    console.log("Unexpected API response format")
+    throw new Error('Unexpected API response format');
+  }
+
+  if (data) {
+    try {
+      fs.writeFile('LatestForeCast.json', data);
+      console.log("File written successfully");
+    } catch (error) {
+      console.log(error);
+    }
+  } else {
+    console.log("No API data found")
+  }
+
+};
+
 cron.schedule('*/10 * * * *', () => {
   getAndSendWeather();
+  getForecast();
 });
