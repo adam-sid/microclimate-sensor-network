@@ -319,7 +319,7 @@ async function getLatestForecast(): Promise<void> {
 
 };
 
-cron.schedule('*/1 * * * *', () => {
+cron.schedule('*/10 * * * *', () => {
   getAndSendWeather();
   getLatestForecast();
 });
