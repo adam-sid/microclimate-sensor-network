@@ -20,6 +20,7 @@ if (selectedNode !== '3') {
 
 const isTouchDevice = navigator.maxTouchPoints > 0;
 
+LEGEND_SCALE = 1.25;
 const HOUR_IN_MS = 60 * 60 * 1000;
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -188,16 +189,15 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
         ]);
 
         series.push({
-            name: isWind ? `Forecast wind ${datasets[0].node}` : `Forecast wind ${datasets[0].node}`,
+            name: isWind ? `Forecast wind ${datasets[0].node}` : `Forecast ${datasets[0].node}`,
             type: 'line',
             data: forecastSeries1,
+            color: isWind ? (datasets.length === 2 ? "#5070dd" : "#6F277D") : "#5070dd",
             lineStyle: {
                 type: 'dashed'
             }
         });
     }
-
-
 
     if (!(isWind && datasets.length == 2)) {
         series.push({
@@ -264,6 +264,8 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
                 name: `Forecast gusts ${datasets[0].node}`,
                 type: 'line',
                 data: gustSeries1,
+                itemStyle: { color: datasets.length == 1 ? "#AC1C7C" : "#42ccdb" },
+                color: datasets.length == 1 ? "#AC1C7C" : "#42ccdb",
                 lineStyle: {
                     type: 'dashed'
                 }
@@ -290,6 +292,11 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
                     color: config.colours
                 }
             },
+            legend: isWind ? {
+                data: series
+                    .filter(s => s.name && !s.name.includes('Forecast'))
+                    .map(s => s.name)
+            } : undefined,
             xAxis: {
                 type: 'time',
                 min: startTimeMs,
@@ -318,7 +325,7 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
                     }
                     return [x, point[1] - tooltipHeight - (isTouchDevice ? 20 : 0)];
                 }
-            }
+            },
         }
         chart.setOption(option, true);
         updateAxisOnResize(chart, startTimeMs);
@@ -342,9 +349,10 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
             ]);
 
             series.push({
-                name: `Forecast ${datasets[1].node}`,
+                name: isWind ? `Forecast wind ${datasets[1].node}` : `Forecast ${datasets[1].node}`,
                 type: 'line',
                 data: forecastSeries2,
+                color: "#b6d634",
                 lineStyle: {
                     type: 'dashed'
                 }
@@ -359,6 +367,7 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
                 smooth: true,
                 symbol: isWind ? 'circle' : 'none',
                 symbolSize: isWind ? 2 : 0,
+                color: "#b6d634",
                 lineStyle: { width: 3 },
                 areaStyle: isWind ? undefined : { opacity: 0.1 },
                 tooltip: isWind ? { show: false } : undefined
@@ -384,6 +393,20 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
                 lineStyle: { width: 4 },
                 color: "#ff994d"
             });
+            const gustSeries2 = forecastData2.map(row => [
+                new Date(row.ts * 1000),
+                row.gust_speed
+            ]);
+            series.push({
+                name: `Forecast gusts ${datasets[1].node}`,
+                type: 'line',
+                data: gustSeries2,
+                itemStyle: { color: "#ff994d" },
+                color: "#ff994d",
+                lineStyle: {
+                    type: 'dashed'
+                }
+            });
         }
 
         const option = {
@@ -395,7 +418,9 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
                 containLabel: true
             },
             legend: {
-                data: series.map(s => s.name),
+                data: series
+                    .filter(s => s.name && !s.name.includes('Forecast'))
+                    .map(s => s.name)
             },
             xAxis: {
                 type: 'time',
@@ -439,7 +464,6 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
         if (datasets.length == 2 || isWind) {
             applyMobileLegendStyle(chart);
         }
-        console.log(chart.getWidth());
     });
 };
 
@@ -499,20 +523,20 @@ function updateAxisOnResize(chart, startTimeMs) {
 //scale legend for smaller screens
 function applyMobileLegendStyle(chart) {
     const width = chart.getWidth();
-    const smallScreen = width > 700 && width < 1200;;
+    const smallScreen = width > 700 && width <= 1200;;
     const mobileScreen = width <= 700;
     chart.setOption({
         legend: {
             bottom: 0,
             icon: 'rect',
             left: 'center',
-            itemWidth: 25,
+            itemWidth: 15,
             textStyle: {
-                fontWeight: 'bolder',
-                fontSize: mobileScreen ? 13 : smallScreen ? 18 : 25
+                fontWeight: 'bold',
+                fontSize: mobileScreen ? LEGEND_SCALE * 10 : smallScreen ? LEGEND_SCALE * 12 : LEGEND_SCALE * 18
             },
-            itemHeight: mobileScreen ? 9 : smallScreen ? 14 : 19,
-            itemGap: mobileScreen ? 14 : smallScreen ? 28 : 50,
+            itemHeight: mobileScreen ? LEGEND_SCALE * 7 : smallScreen ? LEGEND_SCALE * 10 : LEGEND_SCALE * 14,
+            itemGap: mobileScreen ? LEGEND_SCALE * 12 : smallScreen ? LEGEND_SCALE * 18 : LEGEND_SCALE * 25,
 
         },
     }, false);
@@ -532,7 +556,6 @@ async function getHourlyWind(startTime, endTime, node) {
     try {
         const response = await fetch(`/api/database/select-node-range?requestedTable=node_data&start=${loopCountStart}&end=${endTime + 0.5 * HOUR_IN_SECS}&node=${node}`);
         data = await response.json();
-        console.log(`Received ${data.length} rows of data`);
     } catch (error) {
         console.error(`Failed to fetch hourly data`, error);
         return { windAverages: [], gustMaxes: [] };
@@ -584,7 +607,6 @@ async function getForecastData(nodeId) {
     }
 
     const forecastData = await forecastResponse.json()
-    console.log(forecastData);
     return forecastData;
 }
 
