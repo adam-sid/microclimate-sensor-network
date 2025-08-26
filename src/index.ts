@@ -488,7 +488,7 @@ async function readForecastFile(fileName: string): Promise<any[]> {
 }
 
 
-cron.schedule('*/1 * * * *', () => {
+cron.schedule('*/10 * * * *', () => {
   getAndSendWeather();
   getLatestForecast();
 });
