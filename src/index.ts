@@ -29,6 +29,9 @@ app.use(express.json());
 //Queue system to prevent read and write at the same time
 let fileQueue = Promise.resolve();
 
+//bool to check if server started
+let serverStarted = false;
+
 // use HTTP Authorization header standard RFC6750
 const checkSecretWord: RequestHandler = (req, res, next): void => {
   const authorisation = req.get('Authorization');
@@ -220,6 +223,10 @@ app.post('/api/database/insert-weather-data', async (req: Request, res: Response
 
 app.listen(port, () => {
   console.log(`Server is live on ${port}`);
+  if (!serverStarted) {
+    getLatestForecast();
+    serverStarted = true;
+  }
 });
 
 async function getLatestFarmLocation(farmId: string) {
