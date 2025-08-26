@@ -7,7 +7,7 @@
     "test": "jest",
     "start": "node dist/index.js",
     "dev": "nodemon src/index.ts",
-    "build": "tsc"
+    "build": "tsc && cp -R src/models dist/models && cp -R src/forecastData dist/forecastData"
   },
   "repository": {
     "type": "git",
