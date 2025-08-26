@@ -156,7 +156,7 @@ app.get('/api/database/forecast', async (req: Request, res: Response) => {
   const { node } = req.query;
   let nodeName = typeof node === 'string' ? Number(node) : 0;
   try {
-    const forecastData = await readForecastFile(`weatherPrediction${nodeName}`);
+    const forecastData = await readForecastFile(`WeatherPrediction${nodeName}`);
     res.status(200).json(forecastData);
   } catch (error) {
     res.status(500).json({ error: 'failed to get weather forecast from file' });
@@ -490,8 +490,9 @@ async function readForecastFile(fileName: string): Promise<any[]> {
 
 }
 
-
 cron.schedule('*/10 * * * *', () => {
   getAndSendWeather();
   getLatestForecast();
 });
+
+
