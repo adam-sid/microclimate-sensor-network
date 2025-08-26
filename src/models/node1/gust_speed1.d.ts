@@ -1,0 +1,1 @@
+export declare function gust_score1(input: number[]): number;

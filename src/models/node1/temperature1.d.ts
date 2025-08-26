@@ -1,0 +1,1 @@
+export declare function temp_score1(input: number[]): number;

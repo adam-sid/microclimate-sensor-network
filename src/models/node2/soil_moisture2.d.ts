@@ -1,0 +1,1 @@
+export declare function soil_score2(input: number[]): number;

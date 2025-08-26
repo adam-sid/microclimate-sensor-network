@@ -1,4 +1,4 @@
-function score(input) {
+export function temp_score1(input) {
     var var0;
     if (input[4] > 19.650000000000002) {
         if (input[4] > 23.3) {

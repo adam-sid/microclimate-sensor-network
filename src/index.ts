@@ -5,12 +5,28 @@ import { error } from 'console';
 import { RequestHandler } from 'express';
 import cron from 'node-cron';
 import { promises as fs } from 'fs';
+import { WeatherForecast } from './WeatherForecast';
+//node1 model imports
+import { temp_score1 } from './models/node1/temperature1'
+import { humidity_score1 } from './models/node1/humidity1'
+import { wind_score1 } from './models/node1/wind_speed1'
+import { gust_score1 } from './models/node1/gust_speed1'
+import { soil_score1 } from './models/node1/soil_moisture1'
+//node2 model imports
+import { temp_score2 } from './models/node2/temperature2'
+import { humidity_score2 } from './models/node2/humidity2'
+import { wind_score2 } from './models/node2/wind_speed2'
+import { gust_score2 } from './models/node2/gust_speed2'
+import { soil_score2 } from './models/node2/soil_moisture2'
 
 const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(express.static("public", { extensions: ["html"] }));
 app.use(express.json());
+
+//Queue system to prevent read and write at the same time
+let fileQueue = Promise.resolve();
 
 // use HTTP Authorization header standard RFC6750
 const checkSecretWord: RequestHandler = (req, res, next): void => {
@@ -37,6 +53,9 @@ const valueNameWhiteList = new Set(['temperature', 'humidity', 'soil_moisture',
   'wind_speed', 'gust_speed', 'rssi0', 'rssi1', 'snr0', 'snr1', 'ts', '*',
   'node_name', 'node_deployment_id'
 ]);
+
+const unneededWeatherElements = new Set(['feels_like', 'dew_point', 'visibility', 'wind_deg', 'weather', 'pop'])
+const neededWeatherElements = new Set(["temp", "pressure", "humidity", "uvi", "clouds", "wind_speed", "wind_gust"])
 
 const nodeNameWhiteList = new Set([1, 2]);
 
@@ -129,6 +148,17 @@ app.get('/api/database/select-node-range', async (req: Request, res: Response) =
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'failed to select from database' });
+  }
+});
+
+app.get('/api/database/forecast', async (req: Request, res: Response) => {
+  const { node } = req.query;
+  let nodeName = typeof node === 'string' ? Number(node) : 0;
+  try {
+    const forecastData = await readForecastFile(`weatherPrediction${nodeName}`);
+    res.status(200).json(forecastData);
+  } catch (error) {
+    res.status(500).json({ error: 'failed to get weather forecast from file' });
   }
 });
 
@@ -306,20 +336,159 @@ async function getLatestForecast(): Promise<void> {
     throw new Error('Unexpected API response format');
   }
 
-  if (data) {
-    try {
-      await fs.writeFile('src/LatestForeCast.json', JSON.stringify(data));
-      console.log("File written successfully");
-    } catch (error) {
-      console.log(error);
-    }
-  } else {
-    console.log("No API data found")
-  }
-
+  await writeFile(data, "LatestForecast");
+  buildForecastData();
 };
 
-cron.schedule('*/10 * * * *', () => {
+async function buildForecastData() {
+  let hourlyForecast = await readForecastFile("LatestForecast");
+  // Delete the unneeded elements in the rawJson
+  for (const hour of hourlyForecast) {
+    for (const item of unneededWeatherElements) {
+      delete hour[item];
+    }
+    for (const item of neededWeatherElements) {
+      hour[item] = hour[item] ?? 0;
+    }
+    //define hourOfDay and dayOfYear
+    if (hour.dt) {
+      const date = new Date(hour.dt * 1000);
+      const hourOfDay = date.getUTCHours();
+      const startOfYear = new Date(date.getUTCFullYear());
+      const dayOfYear = (date.getTime() - startOfYear.getTime()) / (24 * 60 * 60 * 1000);
+
+      hour.day_sin = parseFloat(Math.sin(2 * Math.PI * hourOfDay / 24).toFixed(5));
+      hour.day_cos = parseFloat(Math.cos(2 * Math.PI * hourOfDay / 24).toFixed(5));
+      hour.year_sin = parseFloat(Math.sin(2 * Math.PI * dayOfYear / 365.25).toFixed(5));
+      hour.year_cos = parseFloat(Math.cos(2 * Math.PI * hourOfDay / 365.25).toFixed(5));
+
+
+      hour.rain_1h = hour.rain?.['1h'] ?? 0;
+      hour.snow_1h = hour.snow?.['1h'] ?? 0;
+    }
+  }
+
+  await writeFile(hourlyForecast, "cleanedForecast")
+
+  getScore();
+}
+
+
+//rewrite this
+async function getScore() {
+  const forecastJson: WeatherForecast[] = await readForecastFile("cleanedForecast");
+
+  if (!forecastJson || forecastJson.length == 0) {
+    console.log("Error no forecast data found");
+    return null;
+  }
+  //Features needed by the model in order
+  const features = [
+    "day_sin",
+    "day_cos",
+    "year_sin",
+    "year_cos",
+    "temp",
+    "pressure",
+    "humidity",
+    "uvi",
+    "clouds",
+    "wind_speed",
+    "wind_gust",
+    "rain_1h",
+    "snow_1h"
+  ];
+
+  const forecastMap = new Map();
+  const predictedWeatherArray1 = [];
+  const predictedWeatherArray2 = [];
+
+  for (const hour of forecastJson) {
+    //Make array with same order as features requirement of model
+    const inputArray = features.map(key => hour[key]);
+    //Put array into a map with unix time key
+    forecastMap.set(hour.dt, inputArray);
+    //Get predicted weather for this hour
+    let temperature1 = temp_score1(forecastMap.get(hour.dt))
+    let humidity1 = humidity_score1(forecastMap.get(hour.dt));
+    let wind_speed1 = wind_score1(forecastMap.get(hour.dt));
+    let gust_speed1 = gust_score1(forecastMap.get(hour.dt));
+    let soil_moisture1 = soil_score1(forecastMap.get(hour.dt));
+    //Put predictions in an object  
+    const predictedWeatherObject1 = {
+      ts: hour.dt,
+      "temperature": parseFloat(temperature1.toFixed(1)),
+      "humidity": parseFloat(humidity1.toFixed(0)),
+      "wind_speed": parseFloat(wind_speed1.toFixed(1)),
+      "gust_speed": parseFloat(gust_speed1.toFixed(1)),
+      "soil_moisture": parseFloat(soil_moisture1.toFixed(0)),
+    };
+    //Put object in an array to turn into JSON
+    predictedWeatherArray1.push(predictedWeatherObject1);
+
+    let temperature2 = temp_score2(forecastMap.get(hour.dt))
+    let humidity2 = humidity_score2(forecastMap.get(hour.dt));
+    let wind_speed2 = wind_score2(forecastMap.get(hour.dt));
+    let gust_speed2 = gust_score2(forecastMap.get(hour.dt));
+    let soil_moisture2 = soil_score2(forecastMap.get(hour.dt));
+    //Put predictions in an object  
+    const predictedWeatherObject2 = {
+      ts: hour.dt,
+      "temperature": parseFloat(temperature2.toFixed(1)),
+      "humidity": parseFloat(humidity2.toFixed(0)),
+      "wind_speed": parseFloat(wind_speed2.toFixed(1)),
+      "gust_speed": parseFloat(gust_speed2.toFixed(1)),
+      "soil_moisture": parseFloat(soil_moisture2.toFixed(0)),
+    };
+    //Put object in an array to turn into JSON
+    predictedWeatherArray2.push(predictedWeatherObject2);
+
+  }
+
+  writeFile(predictedWeatherArray1, "WeatherPrediction1");
+  writeFile(predictedWeatherArray2, "WeatherPrediction2");
+}
+
+
+//write JSON data to file
+async function writeFile(data: any, fileName: string) {
+  // Chain writing into promise queue to prevent overlap with a read action
+  const writing = async () => {
+    if (data) {
+      try {
+        await fs.writeFile(`src/forecastData/${fileName}.json`, JSON.stringify(data));
+        console.log("File written successfully");
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      console.log("No data to write")
+    }
+  };
+
+  fileQueue = fileQueue.then(writing);
+  return fileQueue;
+}
+
+async function readForecastFile(fileName: string): Promise<any[]> {
+  const reading = async () => {
+    try {
+      const file = await fs.readFile(`src/forecastData/${fileName}.json`, 'utf-8');
+      const rawJson = JSON.parse(file);
+      return rawJson;
+    } catch (error) {
+      console.log(error);
+      return [];
+    }
+  }
+  const nextQueuedItem = fileQueue.then(reading);
+  fileQueue = nextQueuedItem;
+  return nextQueuedItem;
+
+}
+
+
+cron.schedule('*/1 * * * *', () => {
   getAndSendWeather();
   getLatestForecast();
 });

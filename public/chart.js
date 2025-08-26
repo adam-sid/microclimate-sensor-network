@@ -32,11 +32,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const nodeValue = e.target.value;
         setNodeDateUrl(nodeValue);
 
-        if (nodeValue === '1') {
+        if (nodeValue == '1') {
             displayedNodes = ['1'];
-        } else if (nodeValue === '2') {
+        } else if (nodeValue == '2') {
             displayedNodes = ['2'];
-        } else if (nodeValue === '3') {
+        } else if (nodeValue == '3') {
             displayedNodes = ['1', '2'];
         } else {
             displayedNodes = [];
@@ -156,7 +156,7 @@ function getChartConfig(chartType) {
                 name: "Soil moisture",
                 min: 18000,
                 max: 55000,
-                colours: ["#FECC63", "#312302"],
+                colours: ["#312302", "#FECC63"],
                 unit: "n/a"
             };
         default:
@@ -178,6 +178,26 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
         new Date(row.ts * 1000),
         row[config.id]
     ]);
+
+    const forecastData1 = await getForecastData(datasets[0].node);
+
+    if (forecastData1 != null) {
+        const forecastSeries1 = forecastData1.map(row => [
+            new Date(row.ts * 1000),
+            row[config.id]
+        ]);
+
+        series.push({
+            name: isWind ? `Forecast wind ${datasets[0].node}` : `Forecast wind ${datasets[0].node}`,
+            type: 'line',
+            data: forecastSeries1,
+            lineStyle: {
+                type: 'dashed'
+            }
+        });
+    }
+
+
 
     if (!(isWind && datasets.length == 2)) {
         series.push({
@@ -235,6 +255,20 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
                 width: 4, color: datasets.length == 1 ? "#AC1C7C" : "#42ccdb",
             },
         });
+        if (forecastData1 != null) {
+            const gustSeries1 = forecastData1.map(row => [
+                new Date(row.ts * 1000),
+                row.gust_speed
+            ]);
+            series.push({
+                name: `Forecast gusts ${datasets[0].node}`,
+                type: 'line',
+                data: gustSeries1,
+                lineStyle: {
+                    type: 'dashed'
+                }
+            });
+        }
     }
 
     if (datasets.length == 1) {
@@ -298,6 +332,25 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
             new Date(row.ts * 1000),
             row[config.id]
         ]);
+
+        const forecastData2 = await getForecastData(datasets[1].node);
+
+        if (forecastData2 != null) {
+            const forecastSeries2 = forecastData2.map(row => [
+                new Date(row.ts * 1000),
+                row[config.id]
+            ]);
+
+            series.push({
+                name: `Forecast ${datasets[1].node}`,
+                type: 'line',
+                data: forecastSeries2,
+                lineStyle: {
+                    type: 'dashed'
+                }
+            });
+        }
+
         if (!isWind) {
             series.push({
                 name: isWind ? undefined : `Node ${datasets[1].node}`,
@@ -443,6 +496,7 @@ function updateAxisOnResize(chart, startTimeMs) {
     }
 }
 
+//scale legend for smaller screens
 function applyMobileLegendStyle(chart) {
     const width = chart.getWidth();
     const smallScreen = width > 700 && width < 1200;;
@@ -464,6 +518,7 @@ function applyMobileLegendStyle(chart) {
     }, false);
 }
 
+//function that collects wind data by hour and returns an average to smooth out differences
 async function getHourlyWind(startTime, endTime, node) {
     const HOUR_IN_SECS = 60 * 60;
 
@@ -519,6 +574,18 @@ async function getHourlyWind(startTime, endTime, node) {
     }
 
     return { windAverages, gustMaxes };
+}
+
+async function getForecastData(nodeId) {
+    const forecastResponse = await fetch(`/api/database/forecast?node=${nodeId}`);
+    if (!forecastResponse.ok) {
+        console.log("Error getting forecast data")
+        return null;
+    }
+
+    const forecastData = await forecastResponse.json()
+    console.log(forecastData);
+    return forecastData;
 }
 
 

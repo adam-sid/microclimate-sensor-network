@@ -1,0 +1,1 @@
+export declare function wind_score2(input: number[]): number;

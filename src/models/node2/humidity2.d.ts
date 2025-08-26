@@ -1,0 +1,1 @@
+export declare function humidity_score2(input: number[]): number;
