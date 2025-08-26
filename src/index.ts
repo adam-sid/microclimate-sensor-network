@@ -453,11 +453,12 @@ async function getScore() {
 
 //write JSON data to file
 async function writeFile(data: any, fileName: string) {
+  const filePath = path.join(__dirname, 'forecastData', `${fileName}.json`);
   // Chain writing into promise queue to prevent overlap with a read action
   const writing = async () => {
     if (data) {
       try {
-        await fs.writeFile(`./forecastData/${fileName}.json`, JSON.stringify(data));
+        await fs.writeFile(filePath, JSON.stringify(data));
         console.log("File written successfully");
       } catch (error) {
         console.log(error);
@@ -472,9 +473,10 @@ async function writeFile(data: any, fileName: string) {
 }
 
 async function readForecastFile(fileName: string): Promise<any[]> {
+  const filePath = path.join(__dirname, 'forecastData', `${fileName}.json`);
   const reading = async () => {
     try {
-      const file = await fs.readFile(`./forecastData/${fileName}.json`, 'utf-8');
+      const file = await fs.readFile(filePath, 'utf-8');
       const rawJson = JSON.parse(file);
       return rawJson;
     } catch (error) {
