@@ -1,4 +1,5 @@
 import express, { Request, Response } from 'express';
+import path from 'path';
 import * as dotenv from 'dotenv'
 import { pool } from './db'
 import { error } from 'console';
@@ -456,7 +457,7 @@ async function writeFile(data: any, fileName: string) {
   const writing = async () => {
     if (data) {
       try {
-        await fs.writeFile(`dist/forecastData/${fileName}.json`, JSON.stringify(data));
+        await fs.writeFile(`./forecastData/${fileName}.json`, JSON.stringify(data));
         console.log("File written successfully");
       } catch (error) {
         console.log(error);
@@ -473,7 +474,7 @@ async function writeFile(data: any, fileName: string) {
 async function readForecastFile(fileName: string): Promise<any[]> {
   const reading = async () => {
     try {
-      const file = await fs.readFile(`dist/forecastData/${fileName}.json`, 'utf-8');
+      const file = await fs.readFile(`./forecastData/${fileName}.json`, 'utf-8');
       const rawJson = JSON.parse(file);
       return rawJson;
     } catch (error) {
