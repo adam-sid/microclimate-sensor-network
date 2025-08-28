@@ -377,12 +377,11 @@ async function buildForecastData() {
   }
 
   await writeFile(hourlyForecast, "cleanedForecast")
-
+  await insertWeatherPrediction(hourlyForecast, "openweather_prediction");
   getScore();
 }
 
 
-//rewrite this
 async function getScore() {
   const forecastJson: WeatherForecast[] = await readForecastFile("cleanedForecast");
 
@@ -454,7 +453,9 @@ async function getScore() {
   }
 
   writeFile(predictedWeatherArray1, "WeatherPrediction1");
+  await insertWeatherPrediction(predictedWeatherArray1, "node_1_prediction");
   writeFile(predictedWeatherArray2, "WeatherPrediction2");
+  await insertWeatherPrediction(predictedWeatherArray2, "node_2_prediction");
 }
 
 
@@ -501,5 +502,52 @@ cron.schedule('*/10 * * * *', () => {
   getAndSendWeather();
   getLatestForecast();
 });
+
+async function insertWeatherPrediction(forecast: any, tableName: string) {
+
+  let query: string;
+  let values: any[];
+
+  if ("temp" in forecast) {
+    query =
+      `INSERT INTO ${tableName} (ts, temperature, pressure, humidity, uvi, clouds, 
+    wind_speed, gust_speed, day_sin, day_cos, year_sin, year_cos, rain_1h, snow_1h)
+    VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14);`;
+
+    values = [
+      forecast.dt,
+      forecast.temp,
+      forecast.pressure,
+      forecast.humidity,
+      forecast.uvi ?? 0,
+      forecast.clouds,
+      forecast.wind_speed,
+      forecast.wind_gust,
+      forecast.day_sin,
+      forecast.day_cos,
+      forecast.year_sin,
+      forecast.year_cos,
+      forecast.rain_1h ?? 0,
+      forecast.snow_1h ?? 0
+    ];
+  } else if ("temperature" in forecast) {
+    query =
+      `INSERT INTO ${tableName} (ts, temperature, humidity, wind_speed, 
+      gust_speed, soil_moisture)
+      VALUES ($1,$2,$3,$4,$5,$6);`;
+    values = [
+      forecast.ts,
+      forecast.temperature,
+      forecast.humidity,
+      forecast.wind_speed,
+      forecast.gust_speed,
+      forecast.soil_moisture
+    ];
+  } else {
+    return;
+  }
+
+  await pool.query(query, values);
+}
 
 
