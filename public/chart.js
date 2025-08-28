@@ -168,7 +168,8 @@ function getChartConfig(chartType) {
 
 async function buildChart(chartDom, datasets, config, startTime, endTime) {
     const chart = echarts.getInstanceByDom(chartDom) || echarts.init(chartDom);
-    const isWind = config.id == 'wind_speed'
+    const isWind = config.id == 'wind_speed';
+    isSoil = config.id == 'soil_moisture';
 
     const startTimeMs = startTime * 1000;
     const endTimeMs = endTime * 1000;
@@ -305,7 +306,9 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
             yAxis: {
                 type: 'value',
                 axisLabel: {
-                    formatter: `{value} ${config.unit}`,
+                    formatter: !isSoil
+                        ? `{value} ${config.unit}`
+                        : function (val) { return formatSoilMoisture(val); }
                 }
             },
             series: series,
@@ -429,7 +432,11 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
             },
             yAxis: {
                 type: 'value',
-                axisLabel: { formatter: `{value} ${config.unit}` }
+                axisLabel: {
+                    formatter: !isSoil
+                        ? `{value} ${config.unit}`
+                        : function (val) { return formatSoilMoisture(val); }
+                }
             },
             series: series,
             tooltip: {
@@ -466,6 +473,20 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
         }
     });
 };
+
+function formatSoilMoisture(raw_value) {
+    if (raw_value > 45000) {
+        return "very dry";
+    } else if (raw_value <= 45000 && raw_value > 35000) {
+        return "dry";
+    } else if (raw_value <= 35000 && raw_value > 25000) {
+        return "damp";
+    } else if (raw_value <= 25000 && raw_value > 20000) {
+        return "wet";
+    } else if (raw_value <= 20000) {
+        return "saturated";
+    }
+}
 
 function updateAxisOnResize(chart, startTimeMs) {
     const width = chart.getWidth();

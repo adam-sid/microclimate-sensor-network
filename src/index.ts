@@ -224,7 +224,7 @@ app.post('/api/database/insert-weather-data', async (req: Request, res: Response
 app.listen(port, () => {
   console.log(`Server is live on ${port}`);
   if (!serverStarted) {
-    getLatestForecast();
+    //getLatestForecast();
     serverStarted = true;
   }
 });
@@ -498,8 +498,8 @@ async function readForecastFile(fileName: string): Promise<any[]> {
 }
 
 cron.schedule('*/10 * * * *', () => {
-  getAndSendWeather();
-  getLatestForecast();
+  //getAndSendWeather();
+  //getLatestForecast();
 });
 
 
