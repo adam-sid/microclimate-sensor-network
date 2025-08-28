@@ -368,7 +368,7 @@ async function buildForecastData() {
       hour.day_sin = parseFloat(Math.sin(2 * Math.PI * hourOfDay / 24).toFixed(5));
       hour.day_cos = parseFloat(Math.cos(2 * Math.PI * hourOfDay / 24).toFixed(5));
       hour.year_sin = parseFloat(Math.sin(2 * Math.PI * dayOfYear / 365.25).toFixed(5));
-      hour.year_cos = parseFloat(Math.cos(2 * Math.PI * hourOfDay / 365.25).toFixed(5));
+      hour.year_cos = parseFloat(Math.cos(2 * Math.PI * dayOfYear / 365.25).toFixed(5));
 
 
       hour.rain_1h = hour.rain?.['1h'] ?? 0;
@@ -499,55 +499,59 @@ async function readForecastFile(fileName: string): Promise<any[]> {
 }
 
 cron.schedule('*/10 * * * *', () => {
-  getAndSendWeather();
-  getLatestForecast();
+  //getAndSendWeather();
+  //getLatestForecast();
 });
 
-async function insertWeatherPrediction(forecast: any, tableName: string) {
+
+//function adds predictions to relevant database
+async function insertWeatherPrediction(forecastByHour: any[], tableName: string) {
 
   let query: string;
   let values: any[];
-
-  if ("temp" in forecast) {
-    query =
-      `INSERT INTO ${tableName} (ts, temperature, pressure, humidity, uvi, clouds, 
+  for (const hour of forecastByHour) {
+    if ("temp" in hour) {
+      query =
+        `INSERT INTO ${tableName} (ts, temperature, pressure, humidity, uvi, clouds, 
     wind_speed, gust_speed, day_sin, day_cos, year_sin, year_cos, rain_1h, snow_1h)
     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14);`;
 
-    values = [
-      forecast.dt,
-      forecast.temp,
-      forecast.pressure,
-      forecast.humidity,
-      forecast.uvi ?? 0,
-      forecast.clouds,
-      forecast.wind_speed,
-      forecast.wind_gust,
-      forecast.day_sin,
-      forecast.day_cos,
-      forecast.year_sin,
-      forecast.year_cos,
-      forecast.rain_1h ?? 0,
-      forecast.snow_1h ?? 0
-    ];
-  } else if ("temperature" in forecast) {
-    query =
-      `INSERT INTO ${tableName} (ts, temperature, humidity, wind_speed, 
+      values = [
+        hour.dt,
+        hour.temp,
+        hour.pressure,
+        hour.humidity,
+        hour.uvi ?? 0,
+        hour.clouds,
+        hour.wind_speed,
+        hour.wind_gust,
+        hour.day_sin,
+        hour.day_cos,
+        hour.year_sin,
+        hour.year_cos,
+        hour.rain_1h ?? 0,
+        hour.snow_1h ?? 0
+      ];
+    } else if ("temperature" in hour) {
+      query =
+        `INSERT INTO ${tableName} (ts, temperature, humidity, wind_speed, 
       gust_speed, soil_moisture)
       VALUES ($1,$2,$3,$4,$5,$6);`;
-    values = [
-      forecast.ts,
-      forecast.temperature,
-      forecast.humidity,
-      forecast.wind_speed,
-      forecast.gust_speed,
-      forecast.soil_moisture
-    ];
-  } else {
-    return;
-  }
+      values = [
+        hour.ts,
+        hour.temperature,
+        hour.humidity,
+        hour.wind_speed,
+        hour.gust_speed,
+        hour.soil_moisture
+      ];
+    } else {
+      console.log("Couldn't insert")
+      return;
+    }
 
-  await pool.query(query, values);
+    await pool.query(query, values);
+  }
 }
 
 
