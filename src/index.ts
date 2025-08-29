@@ -546,7 +546,7 @@ async function insertWeatherPrediction(forecastByHour: any[], tableName: string)
         hour.soil_moisture
       ];
     } else {
-      console.log("Couldn't insert")
+      console.log("Couldn't insert to table")
       return;
     }
 
