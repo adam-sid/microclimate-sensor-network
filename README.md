@@ -11,7 +11,7 @@ accessible via the link above. If you are interested in this project a complete 
 
 ![Sensor node](readme-images/node.jpg)
 
-The hardware consists of four elements: two weather stations (as above), a repeater to boost range and a gateway to POST weather data to the API. These were built using iLabs Challenger RP2040 microcontrollers with a variety of sensors and packed into a water proof enclosure.
+The hardware consists of four elements: two weather stations (as above), a repeater to boost range and a gateway to POST weather data to the API. These were built using iLabs Challenger RP2040 microcontrollers with a variety of sensors and packed into a water proof enclosure. They are completely off-grid with a solar-battery system and have a tested range of 2400m (much longer distances are expected to be possible)
 
 ## Features
 
