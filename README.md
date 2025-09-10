@@ -36,7 +36,7 @@ The website is mobile friendly even on busier graphs and supports automatic ligh
 
 ### Forecasting
 
-The backend also contains machine learning models that were generated from [this separate project](https://github.com/adam-sid/python-machine-learning). Data from the OpenWeather API 3.0 is pulled across and run through the models to generate more accurate microclimate readings.
+The backend also contains machine learning models that were generated from [this separate project](https://github.com/adam-sid/python-machine-learning). Data from OpenWeather API 3.0 is pulled across and run through the models to generate an accurate microclimate forecast up to 48 hours ahead.
 ![Forecast](readme-images/forecast.jpg)
 
 
