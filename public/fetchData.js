@@ -6,13 +6,14 @@ document.addEventListener('DOMContentLoaded', () => {
   setInterval(() => fetchData(true), TWO_MINUTES);
 });
 
+// updates page by called updateNodeData on each node
 function fetchData(isReload) {
   updateNodeData(1);
   updateNodeData(2);
   isReload ? console.log("page reloaded") : undefined;
 }
 
-
+// retrieves data from backend and displays it on relevant tile
 function updateNodeData(nodeId) {
   fetch(`/api/database/select-latest?requestedTable=node_data&selectColumn=*&conditionColumn=node_name&value=${nodeId}`)
     .then(res => {
@@ -32,6 +33,7 @@ function updateNodeData(nodeId) {
     .catch(error => console.log(error));
 }
 
+// updates integer soil moisture to human readable (wet, dry etc)
 function updateSoilMoisture(raw_value) {
   if (raw_value > 45000) {
     return "Very dry";

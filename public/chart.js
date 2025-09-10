@@ -58,6 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+// update parameters in url so reload does not reset them
 function setNodeDateUrl(nodeValue) {
     const url = new URL(window.location);
     url.searchParams.set('node', nodeValue);
@@ -65,6 +66,7 @@ function setNodeDateUrl(nodeValue) {
     history.replaceState(null, '', url);
 }
 
+// retrieves date from url and executes buildChart on relevant date
 function displayChart() {
 
     document.getElementById('date-to-display').textContent = dateToDisplay.toLocaleDateString(
@@ -118,6 +120,7 @@ function displayChart() {
 
 }
 
+// returns chart config depending on chart type
 function getChartConfig(chartType) {
     switch (chartType) {
         case "temperature":
@@ -166,6 +169,7 @@ function getChartConfig(chartType) {
     }
 }
 
+// function to build and display charts on each page
 async function buildChart(chartDom, datasets, config, startTime, endTime) {
     const chart = echarts.getInstanceByDom(chartDom) || echarts.init(chartDom);
     const isWind = config.id == 'wind_speed';
@@ -188,7 +192,7 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
             new Date(row.ts * 1000),
             row[config.id]
         ]);
-
+        //push latest forecast onto series
         series.push({
             name: isWind ? `Forecast wind ${datasets[0].node}` : `Forecast ${datasets[0].node}`,
             type: 'line',
@@ -199,7 +203,7 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
             }
         });
     }
-
+    //if not a wind chart or comparison chart push the sensor data onto series
     if (!(isWind && datasets.length == 2)) {
         series.push({
             type: isWind ? 'scatter' : 'line',
@@ -215,7 +219,8 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
             tooltip: isWind ? { show: false } : undefined
         });
     }
-
+    // wind is built differently to other charts as it relies on average results 
+    // and has extra gust lines
     let windAverages1 = [];
     let gustMaxes1 = [];
     let windAverages2 = [];
@@ -273,7 +278,7 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
             });
         }
     }
-
+    // Below if executes only when one node selected
     if (datasets.length == 1) {
         const option = {
             grid: {
@@ -335,7 +340,7 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
         if (isWind) {
             applyMobileLegendStyle(chart);
         }
-
+        //when comparison button is clicked the below will execute
     } else if (datasets.length == 2) {
 
         const sensorData2 = datasets[1].data.map(row => [
@@ -376,7 +381,7 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
                 tooltip: isWind ? { show: false } : undefined
             });
         }
-
+        //push wind series onto chart
         if (isWind) {
             series.push({
                 name: `Node ${datasets[1].node} avg`,
@@ -411,7 +416,7 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
                 }
             });
         }
-
+        //set chart options
         const option = {
             grid: {
                 left: 0,
@@ -474,6 +479,7 @@ async function buildChart(chartDom, datasets, config, startTime, endTime) {
     });
 };
 
+// set y axis to human readable format
 function formatSoilMoisture(raw_value) {
     if (raw_value > 45000) {
         return "very dry";
@@ -488,6 +494,7 @@ function formatSoilMoisture(raw_value) {
     }
 }
 
+// updates the x axis with fewer values if viewing on a small screen
 function updateAxisOnResize(chart, startTimeMs) {
     const width = chart.getWidth();
     const mobileScreen = width <= 700;
@@ -620,6 +627,7 @@ async function getHourlyWind(startTime, endTime, node) {
     return { windAverages, gustMaxes };
 }
 
+//retrieves forecast from backend
 async function getForecastData(nodeId) {
     const forecastResponse = await fetch(`/api/database/forecast?node=${nodeId}`);
     if (!forecastResponse.ok) {

@@ -1,3 +1,4 @@
+// interfaces for WeatherForecast type and WeatherCondition type
 export interface WeatherForecast {
     [key: string]: any;
     dt: number;
